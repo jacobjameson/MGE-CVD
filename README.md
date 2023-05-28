@@ -1,14 +1,9 @@
-## Masculinity and Toxins
-### Exploring Connections between Adolescent Male Gender Expression, School Social Networks and Gender Norms, and Adult Substance Use
+## Masculinity and CVD
+### The Way to a Man’s Heart (Disease): Exploring Connections between Male Adherence with Gendered Behavior and Cardiovascular Disease Risk
 
-**Authors:  Nathaniel J. Glasser, MD MPP; Jacob Jameson, BA, MS; Elizabeth Tung, MD MS; Stacy Tessler Lindau, MD, MAPP; Harold A. Pollack,, PhD, MPP**
+**Authors: Nathaniel J. Glasser, MD, MPP; Jacob Jameson, MS; Elizabeth Tung, MD, MS; Stacy Tessler Lindau, MD, MAPP; Elbert Huang, MD; Harold A. Pollack, PhD, MPP**
 
 
-#### Key Points 
 
-- Question: How do male adolescents’ school environments impact their gender expression (GE) over time and what are the implications of changes in GE on young adult substance use?
-
-- Findings: In this nationally representative prospective cohort study involving 4,882 male participants, changes in GE over time are predicted by adolescent GE in apposition to school averages, with significant associations with downstream adult substance use.
-
-- Meaning: Interventions that impact adolescent group gender norms may be valuable and unexplored pathways to reducing preventable morbidity and mortality related to male substance use.
+Cardiovascular disease (CVD) is a major source of modifiable morbidity and mortality. Rates vary by gender. We examine associations between male gendered behaviors (GB) in adolescence and early adulthood, and outcomes related to CVD risk conditions (hypertension, diabetes, and hyperlipidemia) in middle adulthood.
 
