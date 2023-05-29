@@ -96,6 +96,4 @@ final.df$cluster <- paste(final.df$region,final.df$psuscid)
 final.df$weights <- final.df$gsw5 / mean(final.df$gsw5, na.rm = T)
 final.df$weights.bio <- final.df$w5biowgt / mean(final.df$w5biowgt, na.rm = T)
 
-# Save data
-write_csv(final.df, 'data/Final.csv')
 ################################################################################

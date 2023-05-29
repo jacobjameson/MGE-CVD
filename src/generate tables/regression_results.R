@@ -21,11 +21,10 @@ source('src/prepare data/Construct Analytical Dataset.R')
 #----------------------------------------------------------------------------------
 
 ### Create function for regression analysis
-logit_analysis <- function(frml, df, j){
-  
+logit_analysis <- function(frml, df, weights){
   frml1 <- as.formula(frml)
   m0 <- glm(formula = frml1, data = df, 
-            weights = weights.bio, family = "quasibinomial")
+            weights = weights, family = "quasibinomial")
   
   cluster <- df$cluster 
   
@@ -39,9 +38,26 @@ logit_analysis <- function(frml, df, j){
            lwr = as.data.frame(ci)[,1],
            upr = as.data.frame(ci)[,2],
            reg = frml) %>%
-    filter( grepl("w4.GE_male_std", term)|  grepl("w1.GE_male_std", term)) 
+    filter(grepl("w4.GE_male_std", term)|  grepl("w1.GE_male_std", term)) 
   
   return(robust_df)
+}
+
+### Create function for APE analysis
+ape_analysis <- function(frml, df, weights){
+  
+  frml1 <- as.formula(frml)
+  m0 <- glm(formula = frml1, data = df, 
+            weights = weights, family = "quasibinomial")
+
+  vcv_robust <- vcovHC(m0, type = "HC0", cluster = ~ cluster)
+
+  ape <- avg_slopes(model = m0, vcov = vcv_robust) %>% 
+    as.data.frame() %>%
+    mutate(outcome = str_squish(word(frml,1,sep = "\\~"))) %>%
+    filter( grepl("w4.GE_male_std", term) | grepl("w1.GE_male_std", term))
+    
+  return(ape)
 }
 
 
@@ -54,7 +70,7 @@ logit_analysis <- function(frml, df, j){
 ################################################################################
 
 # Create a vector of outcome variables
-outcomes <- c("dx_cad5", "dx_htn5", "dx_dm5", "dx_hld5")
+outcomes <- c("dx_htn5", "dx_dm5", "dx_hld5")
 
 # Create a vector of predictor variables
 predictors <- c("w1.GE_male_std", "w4.GE_male_std")
@@ -68,9 +84,10 @@ for (i in seq_along(outcomes)) {
     # Fit the model and save it in a unique object with the generated name
     assign(model_name, logit_analysis(
       frml = paste(outcomes[i], "~ race5 + sespc_al + nhood1_d + ins5 + edu5 + ", predictors[j]),
-      df = subset(final.df, in_sample == 1), j))
+      df = subset(final.df, in_sample.5 == 1), weights))
 }}}
 )
+
 
 logit.models <- ls()[sapply(ls(), function(x) is.data.frame(get(x))) & grepl("^logit", ls())]
 logit.models <- do.call(rbind, mget(logit.models))
@@ -80,8 +97,30 @@ logit.models <- logit.models %>%
 
 write_csv(logit.models, 'tables:figures/Logit Models 1.csv')
 
+# Model 1 w/ Average Marginal Effects ---------------------------------------------
+suppressWarnings({
+  for (i in seq_along(outcomes)) {
+    for (j in seq_along(predictors)) {
+      model_name <- paste0('AME', outcomes[i], j)
+      assign(model_name, ape_analysis(
+        frml = paste(outcomes[i], "~ race5 + sespc_al + nhood1_d + ins5 + edu5 + ", predictors[j]),
+        df = subset(final.df, in_sample.5 == 1), weights))
+    }}}
+)
+
+
+ame.models <- ls()[sapply(ls(), function(x) is.data.frame(get(x))) & grepl("^AME", ls())]
+ame.models <- do.call(rbind, mget(ame.models))
+
+ame.models <- ame.models %>%
+  mutate(model_name = 'Model 1')
+
+write_csv(ame.models, 'tables:figures/AME Models 1.csv')
+
 # Clear environment
-rm(list=setdiff(ls(), c('final.df', 'logit_analysis')))
+rm(list=setdiff(ls(), c('final.df', 'logit_analysis', 'ape_analysis')))
+
+
 
 ################################################################################
 # ------------------------------------------------------------------------------
@@ -99,17 +138,15 @@ outcomes <- list(c("dx_htn5",'w5_bp'),
 # Create a vector of predictor variables
 predictors <- c("w1.GE_male_std", "w4.GE_male_std")
 
+# Stratified ----------- ----------- ----------- ----------- ----------- ----------- -----------
 suppressWarnings({
-    # Loop through each combination of outcome and predictor variables
     for (i in seq_along(outcomes)) {
       for (j in seq_along(predictors)) {
-        # Generate a unique name for the model based on the outcome and predictor variables
         model_name <- paste0('logit', outcomes[i][[1]][1], j)
-        # Fit the model and save it in a unique object with the generated name
         assign(model_name, logit_analysis(
           frml = paste(outcomes[i][[1]][1], "~ race5 + sespc_al + nhood1_d + ins5 + edu5 + ", predictors[j]),
           df = filter(subset(final.df, final.df[[outcomes[[i]][2]]] == 0), 
-                      in_sample.bio == 1), j))
+                      in_sample.bio == 1), weights))
       }}}
 )
 
@@ -121,19 +158,16 @@ mod2.n <- logit.models.n %>%
          biomarker = 'Normal Biomarker')
 
 rm(list=setdiff(ls(), c('final.df', 'logit_analysis', 'mod2.n',
-                        'outcomes', 'predictors')))
+                        'outcomes', 'predictors', 'ape_analysis')))
 
 suppressWarnings({
-  # Loop through each combination of outcome and predictor variables
   for (i in seq_along(outcomes)) {
     for (j in seq_along(predictors)) {
-      # Generate a unique name for the model based on the outcome and predictor variables
       model_name <- paste0('logit', outcomes[i][[1]][1], j)
-      # Fit the model and save it in a unique object with the generated name
       assign(model_name, logit_analysis(
         frml = paste(outcomes[i][[1]][1], "~ race5 + sespc_al + nhood1_d + ins5 + edu5 + ", predictors[j]),
         df = filter(subset(final.df, final.df[[outcomes[[i]][2]]] == 1), 
-                    in_sample.bio == 1), j))
+                    in_sample.bio == 1), weights))
     }}}
 )
 
@@ -149,7 +183,7 @@ logit.models <- rbind(mod2.n, mod2.a)
 write_csv(logit.models, 'tables:figures/Logit Models 2 Stratified.csv')
 
 # Clear environment
-rm(list=setdiff(ls(), c('final.df', 'logit_analysis')))
+rm(list=setdiff(ls(), c('final.df', 'logit_analysis', 'ape_analysis')))
 
 
 # Interaction Term Regression w/ Average Marginal Effects ---------------------------------------------
@@ -258,7 +292,7 @@ ame.models <- do.call(rbind, mget(ame.models))
 write_csv(ame.models, 'tables:figures/Logit Models 2 Modified AME.csv')
 
 # Clear environment
-rm(list=setdiff(ls(), c('final.df', 'logit_analysis')))
+rm(list=setdiff(ls(), c('final.df', 'logit_analysis', 'ape_analysis')))
 
 ################################################################################
 # ------------------------------------------------------------------------------
@@ -276,15 +310,12 @@ meds <- c('w5_anti_htn', 'w5_anti_dm_med_use', 'w5_anti_hld_med_use')
 predictors <- c("w1.GE_male_std", "w4.GE_male_std")
 
 suppressWarnings({
-  # Loop through each combination of outcome and predictor variables
   for (i in seq_along(outcomes)) {
     for (j in seq_along(predictors)) {
-      # Generate a unique name for the model based on the outcome and predictor variables
       model_name <- paste0('logit', outcomes[i], j)
-      # Fit the model and save it in a unique object with the generated name
       assign(model_name, logit_analysis(
         frml = paste(outcomes[i], "~ race5 + sespc_al + nhood1_d + ins5 + edu5 + ", predictors[j], '+ ', meds[i]),
-        df = subset(final.df, in_sample == 1), j))
+        df = subset(final.df, in_sample.bio == 1), weights.bio))
     }}}
 )
 
@@ -296,8 +327,27 @@ logit.models <- logit.models %>%
 
 write_csv(logit.models, 'tables:figures/Logit Models 3.csv')
 
+
+suppressWarnings({
+  for (i in seq_along(outcomes)) {
+    for (j in seq_along(predictors)) {
+      model_name <- paste0('AME', outcomes[i], j)
+      assign(model_name, ape_analysis(
+        frml = paste(outcomes[i], "~ race5 + sespc_al + nhood1_d + ins5 + edu5 + ", predictors[j], '+ ', meds[i]),
+        df = subset(final.df, in_sample.bio == 1), weights.bio))
+    }}}
+)
+
+ape.models <- ls()[sapply(ls(), function(x) is.data.frame(get(x))) & grepl("^AME", ls())]
+ape.models <- do.call(rbind, mget(ape.models))
+
+ape.models <- ape.models %>%
+  mutate(model_name = 'Model 3')
+
+write_csv(ape.models, 'tables:figures/AME Models 3.csv')
+
 # Clear environment
-rm(list=setdiff(ls(), c('final.df', 'logit_analysis')))
+rm(list=setdiff(ls(), c('final.df', 'logit_analysis', 'ape_analysis')))
 
 ################################################################################
 # ------------------------------------------------------------------------------
@@ -316,15 +366,12 @@ diagnoses <- c("dx_htn5", "dx_dm5", "dx_hld5")
 predictors <- c("w1.GE_male_std", "w4.GE_male_std")
 
 suppressWarnings({
-  # Loop through each combination of outcome and predictor variables
   for (i in seq_along(outcomes)) {
     for (j in seq_along(predictors)) {
-      # Generate a unique name for the model based on the outcome and predictor variables
       model_name <- paste0('logit', outcomes[i], j)
-      # Fit the model and save it in a unique object with the generated name
       assign(model_name, logit_analysis(
         frml = paste(outcomes[i], "~ race5 + sespc_al + nhood1_d + ins5 + edu5 + ", predictors[j]),
-        df = filter(subset(final.df, final.df[diagnoses[i]] == 1), in_sample.bio == 1), j))
+        df = filter(subset(final.df, final.df[diagnoses[i]] == 1), in_sample.bio == 1), weights.bio))
     }}}
 )
 
@@ -337,7 +384,7 @@ logit.models <- logit.models %>%
 write_csv(logit.models, 'tables:figures/Logit Models 4 Stratified dx=1.csv')
 
 # Clear environment
-rm(list=setdiff(ls(), c('final.df', 'logit_analysis')))
+rm(list=setdiff(ls(), c('final.df', 'logit_analysis', 'ape_analysis')))
 
 # Interaction Term Regression w/ Average Marginal Effects ---------------------------------------------
 #------------------------------------------------------------------------------------------------------
