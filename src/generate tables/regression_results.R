@@ -138,7 +138,8 @@ outcomes <- list(c("dx_htn5",'w5_bp'),
 # Create a vector of predictor variables
 predictors <- c("w1.GE_male_std", "w4.GE_male_std")
 
-# Stratified ----------- ----------- ----------- ----------- ----------- ----------- -----------
+# Stratified -----------------------------------------------------------------------------------
+
 suppressWarnings({
     for (i in seq_along(outcomes)) {
       for (j in seq_along(predictors)) {
@@ -319,6 +320,7 @@ suppressWarnings({
     }}}
 )
 
+
 logit.models <- ls()[sapply(ls(), function(x) is.data.frame(get(x))) & grepl("^logit", ls())]
 logit.models <- do.call(rbind, mget(logit.models))
 
@@ -488,7 +490,7 @@ ape.3b <- slopes(model = m3, vcov = vcv_robust,  newdata = datagrid(dx_hld5 = c(
 ame.models <- ls()[sapply(ls(), function(x) is.data.frame(get(x))) & grepl("^ape", ls())]
 ame.models <- do.call(rbind, mget(ame.models))
 
-write_csv(ame.models, 'tables:figures/Logit Models 4 Modified AME.csv')
+write_csv(ame.models, 'tables:figures/AME Models 4.csv')
 
 
 

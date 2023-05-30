@@ -46,7 +46,6 @@ glucose <- read_xpt(paste0(glucose_path, '/bglua1c5.xpt'))
 
 weights <- read_xpt(paste0(weights_path, '/bweight5.xpt'))
 
-
 # Merge Data
 wave.5 <- merge(wave.5, anthro, by='AID', all.x = T)
 wave.5 <- merge(wave.5, cardio, by='AID', all.x = T)
@@ -88,7 +87,6 @@ wave.5 <- wave.5 %>%
     w5_anti_hld_med_use = case_when(
       h5c_med2 == 0 ~ 0,
       h5c_med2 == 1 ~ 1))
-
 
 # Biomarker data
 wave.5 <- wave.5 %>%
@@ -162,5 +160,4 @@ wave.5 <- wave.5 %>%
 
 
 wave.5$w5_male <- factor(ifelse(wave.5$h5od2b == 1, 1, 0))
-
 ################################################################################
