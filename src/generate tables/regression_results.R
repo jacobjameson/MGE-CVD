@@ -88,7 +88,6 @@ for (i in seq_along(outcomes)) {
 }}}
 )
 
-
 logit.models <- ls()[sapply(ls(), function(x) is.data.frame(get(x))) & grepl("^logit", ls())]
 logit.models <- do.call(rbind, mget(logit.models))
 
@@ -98,6 +97,7 @@ logit.models <- logit.models %>%
 write_csv(logit.models, 'tables:figures/Logit Models 1.csv')
 
 # Model 1 w/ Average Marginal Effects ---------------------------------------------
+
 suppressWarnings({
   for (i in seq_along(outcomes)) {
     for (j in seq_along(predictors)) {
@@ -119,8 +119,6 @@ write_csv(ame.models, 'tables:figures/AME Models 1.csv')
 
 # Clear environment
 rm(list=setdiff(ls(), c('final.df', 'logit_analysis', 'ape_analysis')))
-
-
 
 ################################################################################
 # ------------------------------------------------------------------------------
@@ -335,7 +333,7 @@ suppressWarnings({
     for (j in seq_along(predictors)) {
       model_name <- paste0('AME', outcomes[i], j)
       assign(model_name, ape_analysis(
-        frml = paste(outcomes[i], "~ race5 + sespc_al + nhood1_d + ins5 + edu5 + ", predictors[j], '+ ', meds[i]),
+        frml = paste(outcomes[i], "~ race5 + sespc_al + nhood1_d + ins5 + edu5 + ", predictors[j], '+', meds[i]),
         df = subset(final.df, in_sample.bio == 1), weights.bio))
     }}}
 )
@@ -390,12 +388,17 @@ rm(list=setdiff(ls(), c('final.df', 'logit_analysis', 'ape_analysis')))
 
 # Interaction Term Regression w/ Average Marginal Effects ---------------------------------------------
 #------------------------------------------------------------------------------------------------------
-m1 <- glm(formula = w5_anti_htn ~ race5 + sespc_al + nhood1_d + ins5 + edu5 + w1.GE_male_std*dx_htn5,
+
+m1 <- glm(formula = w5_anti_htn ~ race5 + sespc_al + nhood1_d + 
+            ins5 + edu5 + w1.GE_male_std*dx_htn5,
           data = filter(final.df, in_sample.bio == 1), 
           weights = weights.bio, family = "quasibinomial")
 
+table(filter(final.df, in_sample.bio == 1)$w5_anti_htn)
+
 vcv_robust <- vcovHC(m1, type = "HC0", cluster = ~ cluster)
 
+summary(m1)
 ape.1 <- slopes(model = m1, vcov = vcv_robust,  newdata = datagrid(dx_htn5 = c(0, 1))) %>% 
   as.data.frame() %>%
   mutate(outcome = 'w5_anti_htn') %>%
@@ -453,8 +456,10 @@ ape.2b <- slopes(model = m2, vcov = vcv_robust,  newdata = datagrid(dx_dm5 = c(0
                   "estimate", "std.error", "statistic",
                   "p.value", "conf.low", "conf.high", "predicted", 
                   "predicted_hi", "predicted_lo"))
+
 #------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------
+
 m3 <- glm(formula = w5_anti_hld_med_use ~ race5 + sespc_al + nhood1_d + ins5 + edu5 + w1.GE_male_std*dx_hld5,
           data = filter(final.df, in_sample.bio == 1), 
           weights = weights.bio, family = "quasibinomial")

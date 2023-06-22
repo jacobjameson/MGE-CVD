@@ -29,13 +29,14 @@ source('src/prepare data/Construct Analytical Dataset.R')
 ##########################################################################
 # Figure 1 ---------------------------------------------------------------
 ##########################################################################
-
+summary(m1)
 m1 <- glm(formula = w5_anti_htn ~ race5 + sespc_al + nhood1_d + ins5 + 
           edu5 + w1.GE_male_std*dx_htn5,
           data = filter(final.df, in_sample.bio == 1), 
           weights = weights.bio, family = "quasibinomial")
 
-m1b <- glm(formula = w5_anti_htn ~ race5 + sespc_al + nhood1_d + w4.GE_male_std*dx_htn5,
+m1b <- glm(formula = w5_anti_htn ~ race5 + sespc_al + nhood1_d + 
+          w4.GE_male_std*dx_htn5,
           data = filter(final.df, in_sample == 1), 
           weights = weights.bio, family = "quasibinomial")
 
@@ -55,8 +56,8 @@ df.1b <- ggpredict(m1b, terms = c('w4.GE_male_std [-2:2 by=0.1]', 'dx_htn5 [0,1]
 #-------------------------------------------------------------------------
 
 
-m2 <- glm(formula = w5_anti_dm_med_use ~ race5 + sespc_al + nhood1_d + ins5 +
-          edu5 + w1.GE_male_std*dx_dm5,
+m2 <- glm(formula = w5_anti_dm_med_use ~ race5 + sespc_al + nhood1_d +
+          w1.GE_male_std*dx_dm5,
           data = filter(final.df, in_sample.bio == 1), 
           weights = weights.bio, family = "quasibinomial")
 
@@ -83,8 +84,8 @@ df.2b <- ggpredict(m2b, terms = c('w4.GE_male_std [-2:2 by=0.1]', 'dx_dm5 [0,1]'
 
 #-------------------------------------------------------------------------
 
-m3 <- glm(formula = w5_anti_hld_med_use ~ race5 + sespc_al + nhood1_d + ins5 + 
-          edu5 + w1.GE_male_std*dx_hld5,
+m3 <- glm(formula = w5_anti_hld_med_use ~ race5 + sespc_al + nhood1_d + 
+          w1.GE_male_std*dx_hld5,
           data = filter(final.df, in_sample.bio == 1), 
           weights = weights.bio, family = "quasibinomial")
 
@@ -114,20 +115,17 @@ df.3b <- ggpredict(m3b, terms = c('w4.GE_male_std [-2:2 by=0.1]', 'dx_hld5 [0,1]
 #-------------------------------------------------------------------------
 
 
-fig.1 <- rbind(df.1, df.1b)
+fig.1 <- rbind(df.1b, df.2, df.3)
                
-
-
-ggplot(df.1b, aes(x=xvals,fill=group)) +
+ggplot(fig.1, aes(x=xvals,fill=group)) +
   geom_ribbon(aes(ymin=lower,ymax=upper), alpha=0.2) +
   geom_line(aes(y=coef)) + 
-  theme_minimal() 
-
-
-+ theme(plot.caption = element_text(hjust = 0),
+  theme_minimal() +
+  facet_wrap(~Variables, ncol=3) +
+  theme(plot.caption = element_text(hjust = 0),
                           text = element_text(size = 20)) +
-  facet_wrap(~group, nrow = 2) + geom_vline(xintercept =0, color='darkred') +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits =c(0.1, 0.9)) +
+  geom_vline(xintercept =0, color='darkred') +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits =c(0, 0.9)) +
   labs(fill = "Wave IV Behavior",
        y = "Predicted Probability\n", 
        x='\nStandardized Gender Expression\n',
@@ -138,7 +136,8 @@ ggplot(df.1b, aes(x=xvals,fill=group)) +
                           The effect of GE on substance use behaviors is stronger in young adults. 
                           Model 0 does not control for baseline substance use because of 
                           the associations between baseline substance use and adolescent GE', 140)) +
-  theme(plot.caption = element_text(hjust = 0, size = 11))
+  theme(plot.caption = element_text(hjust = 0, size = 11),
+        legend.position = 'bottom')
 
 
 

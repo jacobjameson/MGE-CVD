@@ -24,7 +24,7 @@ wave.5 <- merge(wave.5, weights.5, by='AID')
 rm(weights.5)
 ################################################################################
 ### Incorporate biomarker data
-bio_path <- '~/Desktop/Add Health Project BP/data/Wave V Biomarker Files'
+bio_path <- '~/Desktop/Archive/Data Upload 2.2022/Wave V Biomarker Files'
 
 # Data paths
 anthro_path <-  paste0(bio_path, '/Wave V Anthropometrics')
@@ -35,6 +35,8 @@ meds_path <-  paste0(bio_path, '/Wave V Medications - Home Exam')
 weights_path <-  paste0(bio_path, '/Wave V Biomarker Sample Weight')
 
 # Load Data
+bmeds <- read_xpt(paste0(meds_path, '/bmeds5.xpt'))
+
 anthro <- read_xpt(paste0(anthro_path, '/banthro5.xpt'))
 anthro$in_bio = 1
 
@@ -88,6 +90,7 @@ wave.5 <- wave.5 %>%
       h5c_med2 == 0 ~ 0,
       h5c_med2 == 1 ~ 1))
 
+table(wave.5$h5aht)
 # Biomarker data
 wave.5 <- wave.5 %>%
   mutate(
