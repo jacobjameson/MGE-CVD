@@ -9,7 +9,7 @@ library(haven)
 library(scales)
 
 # Data paths ------------------------------------------------------------
-data_path <- '~/Add Health Data'
+data_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Core Files - Wave V'
 survey_path <-  paste0(data_path, '/Wave V Mixed-Mode Survey Data')
 weights_path <-  paste0(data_path, '/Wave V Mixed-Mode Survey Weights')
 
@@ -24,10 +24,9 @@ wave.5 <- merge(wave.5, weights.5, by='AID')
 rm(weights.5)
 ################################################################################
 ### Incorporate biomarker data
-bio_path <- '~/Desktop/Archive/Data Upload 2.2022/Wave V Biomarker Files'
+bio_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Wave V Biomarker Files'
 
 # Data paths
-anthro_path <-  paste0(bio_path, '/Wave V Anthropometrics')
 cardio_path <-  paste0(bio_path, '/Wave V Cardiovascular Measures')
 lipids_path <-  paste0(bio_path, '/Wave V Lipids')
 glucose_path <-  paste0(bio_path, '/Wave V Glucose Homeostasis')
@@ -36,20 +35,12 @@ weights_path <-  paste0(bio_path, '/Wave V Biomarker Sample Weight')
 
 # Load Data
 bmeds <- read_xpt(paste0(meds_path, '/bmeds5.xpt'))
-
-anthro <- read_xpt(paste0(anthro_path, '/banthro5.xpt'))
-anthro$in_bio = 1
-
 cardio <- read_xpt(paste0(cardio_path, '/bcardio5.xpt'))
-
 lipids <- read_xpt(paste0(lipids_path, '/blipids5.xpt'))
-
 glucose <- read_xpt(paste0(glucose_path, '/bglua1c5.xpt'))
-
 weights <- read_xpt(paste0(weights_path, '/bweight5.xpt'))
 
 # Merge Data
-wave.5 <- merge(wave.5, anthro, by='AID', all.x = T)
 wave.5 <- merge(wave.5, cardio, by='AID', all.x = T)
 wave.5 <- merge(wave.5, lipids, by='AID', all.x = T)
 wave.5 <- merge(wave.5, glucose, by='AID', all.x = T)

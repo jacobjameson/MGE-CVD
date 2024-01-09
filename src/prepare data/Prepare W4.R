@@ -4,17 +4,12 @@
 #-------------------------------------------------------------------------
 #
 # load packages ----------------------------------------------------------
-libs <- c("tidyverse", "haven", 'scales')
-
-installed_libs <- libs %in% rownames (installed.packages ())
-if (any (installed_libs == F)) {
-  install.packages (libs[!installed_libs])
-}
-
-invisible(lapply (libs, library, character.only = T))
+library(tidyverse)
+library(haven)
+library(scales)
 
 # Data paths ------------------------------------------------------------
-data_path <- '~/Add Health Data'
+data_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Core Files - Wave IV'
 inhome_path <-  paste0(data_path, '/Wave IV In Home Interview Data/wave4')
 weights_path <-  paste0(data_path, '/Wave IV Grand Sample Weights/weights4')
 
@@ -101,8 +96,8 @@ wave.4 <- wave.4 %>%
 
 # convert to factor with specified labels
 wave.4$edu <- factor(wave.4$edu, levels = c("Some HS or Less", "HS Diploma/GED",
-                                    "Some College or Tech/Assoc Degree",
-                                    "College Degree or More"))
+                                            "Some College or Tech/Assoc Degree",
+                                            "College Degree or More"))
 
 
 wave.4 <- wave.4 %>% 

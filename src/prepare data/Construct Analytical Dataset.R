@@ -1,6 +1,5 @@
 ################################################################################
 # AUTHOR:             JACOB JAMESON
-# LAST UPDATED:       12/30/2022
 # PURPOSE:            CONSTRUCT W1,W4,W5 Analytical Dataset
 ################################################################################
 
@@ -16,7 +15,7 @@ source('src/prepare data/Prepare W4.R')
 source('src/prepare data/Prepare W5.R')
 
 # Get SES data
-ses_path <- '~/Desktop/Add Health Project BP/data/Constructed SES Variables'
+ses_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Constructed Files/Constructed SES Variables'
 ses.data <- read_xpt(paste0(ses_path, '/conses4.xpt'))
 names(ses.data) <- tolower(names(ses.data))
 
@@ -79,7 +78,7 @@ vars.keep <- c('dx_cad5', 'dx_htn5', 'dx_dm5', 'dx_hld5',
                'sespc_al', 'nhood1_d', 'race', 
                'w4_male', 'above_school_avg', 'w5_nhdl',
                'lipid5cat', 'w5_a1c', 'w5_bp', 'race5_d', 'race5', 'ins5',
-               'edu5', 'in_bio', 'w5biowgt')
+               'edu5', 'w5biowgt')
 
 
 final.df <- final.df[, vars.keep]
@@ -90,6 +89,7 @@ final.df <- final.df %>%
          in_sample = ifelse(is.na(w1.GE_male) == F & is.na(w4.GE_male) == F, in_sample, 0),
          in_sample.5  = ifelse(in_sample == 1 & is.na(gsw5) == F, 1, 0),
          in_sample.bio = ifelse(in_sample == 1 & is.na(w5biowgt) == F, 1, 0))
+
 
 #create cluster var
 final.df$cluster <- paste(final.df$region,final.df$psuscid)

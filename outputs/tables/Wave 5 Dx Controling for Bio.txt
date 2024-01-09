@@ -1,0 +1,270 @@
+
+Dx Wave 5 with w1.GE
+==============================================================================
+                                                Dependent variable:           
+                                      ----------------------------------------
+                                                                              
+                                      Diagnosis HTN Diagnosis DM Diagnosis HLD
+                                           (1)          (2)           (3)     
+------------------------------------------------------------------------------
+get(predictor)                          -0.345**      -0.379**      -0.141*   
+                                        p = 0.020    p = 0.049     p = 0.096  
+                                                                              
+w5_bp                                   0.665***                              
+                                       p = 0.00004                            
+                                                                              
+w5_a1c                                                4.262***                
+                                                     p = 0.000                
+                                                                              
+w5_nhdl                                                            1.125***   
+                                                                  p = 0.00000 
+                                                                              
+race5Black/Af-Am                          0.356        0.665        -0.418    
+                                        p = 0.105    p = 0.249     p = 0.116  
+                                                                              
+race5Hispanic                             0.245      -1.676***       0.229    
+                                        p = 0.454    p = 0.004     p = 0.511  
+                                                                              
+race5Asian/Pacific Islander              -0.162       -1.202*        0.141    
+                                        p = 0.750    p = 0.057     p = 0.843  
+                                                                              
+race5Other                                0.529       2.068***       0.736    
+                                        p = 0.399    p = 0.002     p = 0.191  
+                                                                              
+sespc_al                                 -0.074       -0.291**       0.116    
+                                        p = 0.341    p = 0.041     p = 0.148  
+                                                                              
+nhood1_d                                 -0.001        -0.007       -0.001    
+                                        p = 0.921    p = 0.704     p = 0.925  
+                                                                              
+ins5Private or Employer-Based            -0.043        -0.011        0.141    
+                                        p = 0.883    p = 0.990     p = 0.719  
+                                                                              
+ins5Medicaid/Medicare                    0.631*        0.363       1.367***   
+                                        p = 0.073    p = 0.675     p = 0.001  
+                                                                              
+ins5Other Government                     -0.473        -1.250        0.552    
+                                        p = 0.364    p = 0.201     p = 0.344  
+                                                                              
+edu5HS Diploma/GED                       -0.165        -0.750       -0.784    
+                                        p = 0.736    p = 0.363     p = 0.142  
+                                                                              
+edu5Some College or Tech/Assoc Degree     0.070        -1.035       -0.206    
+                                        p = 0.878    p = 0.233     p = 0.664  
+                                                                              
+edu5College Degree or More                0.009        -0.741        0.005    
+                                        p = 0.986    p = 0.379     p = 0.992  
+                                                                              
+get(predictor):w5_bp                      0.230                               
+                                        p = 0.219                             
+                                                                              
+get(predictor):w5_a1c                                  -0.354                 
+                                                     p = 0.363                
+                                                                              
+get(predictor):w5_nhdl                                              -0.102    
+                                                                   p = 0.718  
+                                                                              
+Constant                                -1.701***     -2.589**     -1.434**   
+                                        p = 0.004    p = 0.013     p = 0.021  
+                                                                              
+==============================================================================
+==============================================================================
+Note:                                              *p<0.1; **p<0.05; ***p<0.01
+
+Dx Wave 5 with w4.GE
+==============================================================================
+                                                Dependent variable:           
+                                      ----------------------------------------
+                                                                              
+                                      Diagnosis HTN Diagnosis DM Diagnosis HLD
+                                           (1)          (2)           (3)     
+------------------------------------------------------------------------------
+get(predictor)                          -0.389**       -0.222      -0.240**   
+                                        p = 0.016    p = 0.374     p = 0.014  
+                                                                              
+w5_bp                                   0.598***                              
+                                       p = 0.0004                             
+                                                                              
+w5_a1c                                                4.186***                
+                                                     p = 0.000                
+                                                                              
+w5_nhdl                                                            1.124***   
+                                                                  p = 0.00000 
+                                                                              
+race5Black/Af-Am                          0.279        0.446        -0.489*   
+                                        p = 0.218    p = 0.527     p = 0.069  
+                                                                              
+race5Hispanic                             0.140      -1.856***       0.134    
+                                        p = 0.674    p = 0.005     p = 0.707  
+                                                                              
+race5Asian/Pacific Islander              -0.329       -1.429**       0.050    
+                                        p = 0.549    p = 0.033     p = 0.940  
+                                                                              
+race5Other                                0.547       2.043**        0.824    
+                                        p = 0.361    p = 0.011     p = 0.160  
+                                                                              
+sespc_al                                 -0.062       -0.277*        0.126    
+                                        p = 0.405    p = 0.052     p = 0.108  
+                                                                              
+nhood1_d                                 -0.0003       -0.009        0.001    
+                                        p = 0.972    p = 0.661     p = 0.955  
+                                                                              
+ins5Private or Employer-Based            -0.026        -0.006        0.219    
+                                        p = 0.924    p = 0.994     p = 0.584  
+                                                                              
+ins5Medicaid/Medicare                    0.691**       0.362       1.433***   
+                                        p = 0.040    p = 0.667    p = 0.0005  
+                                                                              
+ins5Other Government                     -0.344        -1.002        0.720    
+                                        p = 0.512    p = 0.330     p = 0.255  
+                                                                              
+edu5HS Diploma/GED                       -0.090        -0.647       -0.749    
+                                        p = 0.847    p = 0.419     p = 0.146  
+                                                                              
+edu5Some College or Tech/Assoc Degree     0.122        -1.051       -0.196    
+                                        p = 0.777    p = 0.221     p = 0.670  
+                                                                              
+edu5College Degree or More                0.005        -0.639       -0.037    
+                                        p = 0.992    p = 0.445     p = 0.940  
+                                                                              
+get(predictor):w5_bp                      0.180                               
+                                        p = 0.315                             
+                                                                              
+get(predictor):w5_a1c                                  -0.053                 
+                                                     p = 0.881                
+                                                                              
+get(predictor):w5_nhdl                                               0.054    
+                                                                   p = 0.853  
+                                                                              
+Constant                                -1.681***     -2.485**     -1.513**   
+                                        p = 0.002    p = 0.016     p = 0.015  
+                                                                              
+==============================================================================
+==============================================================================
+Note:                                              *p<0.1; **p<0.05; ***p<0.01
+
+Dx Wave 5 with delta
+==============================================================================
+                                                Dependent variable:           
+                                      ----------------------------------------
+                                                                              
+                                      Diagnosis HTN Diagnosis DM Diagnosis HLD
+                                           (1)          (2)           (3)     
+------------------------------------------------------------------------------
+get(predictor)                            0.050        0.142        -0.049    
+                                        p = 0.686    p = 0.513     p = 0.497  
+                                                                              
+w5_bp                                   0.623***                              
+                                       p = 0.0002                             
+                                                                              
+w5_a1c                                                4.318***                
+                                                     p = 0.000                
+                                                                              
+w5_nhdl                                                            1.114***   
+                                                                  p = 0.00000 
+                                                                              
+race5Black/Af-Am                          0.298        0.617        -0.456*   
+                                        p = 0.187    p = 0.318     p = 0.088  
+                                                                              
+race5Hispanic                             0.257       -1.556**       0.231    
+                                        p = 0.458    p = 0.027     p = 0.534  
+                                                                              
+race5Asian/Pacific Islander              -0.216       -1.239**       0.100    
+                                        p = 0.665    p = 0.049     p = 0.885  
+                                                                              
+race5Other                                0.463       1.968***       0.732    
+                                        p = 0.434    p = 0.008     p = 0.211  
+                                                                              
+sespc_al                                 -0.069       -0.284**       0.124    
+                                        p = 0.365    p = 0.043     p = 0.118  
+                                                                              
+nhood1_d                                 -0.002        -0.010       -0.001    
+                                        p = 0.805    p = 0.622     p = 0.927  
+                                                                              
+ins5Private or Employer-Based            -0.028        -0.021        0.185    
+                                        p = 0.922    p = 0.979     p = 0.636  
+                                                                              
+ins5Medicaid/Medicare                    0.660*        0.364       1.389***   
+                                        p = 0.051    p = 0.658     p = 0.001  
+                                                                              
+ins5Other Government                     -0.470        -1.391        0.579    
+                                        p = 0.368    p = 0.163     p = 0.332  
+                                                                              
+edu5HS Diploma/GED                       -0.096        -0.703       -0.734    
+                                        p = 0.845    p = 0.400     p = 0.167  
+                                                                              
+edu5Some College or Tech/Assoc Degree     0.109        -0.947       -0.194    
+                                        p = 0.814    p = 0.293     p = 0.682  
+                                                                              
+edu5College Degree or More                0.067        -0.574        0.014    
+                                        p = 0.888    p = 0.510     p = 0.979  
+                                                                              
+get(predictor):w5_bp                     -0.102                               
+                                        p = 0.509                             
+                                                                              
+get(predictor):w5_a1c                                  0.147                  
+                                                     p = 0.667                
+                                                                              
+get(predictor):w5_nhdl                                               0.121    
+                                                                   p = 0.495  
+                                                                              
+Constant                                -1.667***     -2.552**     -1.466**   
+                                        p = 0.005    p = 0.016     p = 0.020  
+                                                                              
+==============================================================================
+==============================================================================
+Note:                                              *p<0.1; **p<0.05; ***p<0.01
+            term    contrast w5_bp    estimate  std.error statistic    p.value  s.value    conf.low    conf.high predicted_lo
+1 w1.GE_male_std mean(dY/dX)     0 -0.04617910 0.02014471 -2.292368 0.02188439 5.513954 -0.08566202 -0.006696192   0.09311355
+2 w1.GE_male_std mean(dY/dX)     1 -0.02242096 0.01832207 -1.223713 0.22106033 2.177488 -0.05833155  0.013489631   0.21342442
+  predicted_hi  predicted outcome
+1   0.09310203 0.09310779 dx_htn5
+2   0.21341679 0.21342061 dx_htn5
+            term    contrast w5_a1c    estimate   std.error statistic    p.value  s.value    conf.low     conf.high
+1 w1.GE_male_std mean(dY/dX)      0 -0.01025994 0.005646197 -1.817142 0.06919538 3.853181 -0.02132628  0.0008064012
+2 w1.GE_male_std mean(dY/dX)      1 -0.13695753 0.061971554 -2.210006 0.02710472 5.205312 -0.25841954 -0.0154955142
+  predicted_lo predicted_hi  predicted outcome
+1   0.01424923   0.01424713 0.01424818  dx_dm5
+2   0.61190471   0.61183590 0.61187031  dx_dm5
+            term    contrast w5_nhdl    estimate  std.error  statistic   p.value  s.value    conf.low   conf.high predicted_lo
+1 w1.GE_male_std mean(dY/dX)       0 -0.02311081 0.01446875 -1.5972911 0.1102008 3.181793 -0.05146905 0.005247425    0.1674949
+2 w1.GE_male_std mean(dY/dX)       1 -0.05625479 0.05948768 -0.9456545 0.3443248 1.538158 -0.17284849 0.060338914    0.4340476
+  predicted_hi predicted outcome
+1    0.1674871 0.1674910 dx_hld5
+2    0.4340240 0.4340358 dx_hld5
+            term    contrast w5_bp    estimate  std.error statistic    p.value  s.value    conf.low   conf.high predicted_lo
+1 w4.GE_male_std mean(dY/dX)     0 -0.05354919 0.02184301 -2.451548 0.01422430 6.135498 -0.09636070 -0.01073768    0.1221371
+2 w4.GE_male_std mean(dY/dX)     1 -0.04051762 0.01724850 -2.349052 0.01882126 5.731493 -0.07432405 -0.00671119    0.2455182
+  predicted_hi predicted outcome
+1    0.1221219 0.1221295 dx_htn5
+2    0.2455041 0.2455112 dx_htn5
+            term    contrast w5_a1c     estimate   std.error  statistic   p.value  s.value    conf.low   conf.high predicted_lo
+1 w4.GE_male_std mean(dY/dX)      0 -0.006136504 0.006414847 -0.9566096 0.3387644 1.561646 -0.01870937 0.006436365   0.02769651
+2 w4.GE_male_std mean(dY/dX)      1 -0.054348982 0.056825976 -0.9564109 0.3388647 1.561219 -0.16572585 0.057027885   0.28679805
+  predicted_hi  predicted outcome
+1   0.02769434 0.02769542  dx_dm5
+2   0.28677764 0.28678784  dx_dm5
+            term    contrast w5_nhdl    estimate  std.error  statistic     p.value   s.value   conf.low   conf.high
+1 w4.GE_male_std mean(dY/dX)       0 -0.03902548 0.01422925 -2.7426232 0.006095059 7.3581442 -0.0669143 -0.01113665
+2 w4.GE_male_std mean(dY/dX)       1 -0.04340874 0.06821114 -0.6363877 0.524523725 0.9309201 -0.1771001  0.09028265
+  predicted_lo predicted_hi predicted outcome
+1    0.1419434    0.1419328 0.1419381 dx_hld5
+2    0.5100388    0.5100220 0.5100304 dx_hld5
+            term    contrast w5_bp     estimate  std.error  statistic   p.value   s.value    conf.low  conf.high predicted_lo
+1 delta_w1_w4_GE mean(dY/dX)     0  0.006869551 0.01706264  0.4026077 0.6872369 0.5411207 -0.02657261 0.04031172    0.1191664
+2 delta_w1_w4_GE mean(dY/dX)     1 -0.010151894 0.01465302 -0.6928193 0.4884230 1.0337971 -0.03887128 0.01856749    0.2570707
+  predicted_hi predicted outcome
+1    0.1191702 0.1191683 dx_htn5
+2    0.2570636 0.2570672 dx_htn5
+            term    contrast w5_a1c    estimate   std.error statistic   p.value   s.value     conf.low  conf.high predicted_lo
+1 delta_w1_w4_GE mean(dY/dX)      0 0.003878375 0.006014894 0.6447953 0.5190599 0.9460271 -0.007910601 0.01566735   0.02030348
+2 delta_w1_w4_GE mean(dY/dX)      1 0.057841949 0.055741736 1.0376776 0.2994202 1.7397566 -0.051409845 0.16709374   0.37332807
+  predicted_hi predicted outcome
+1   0.02030552 0.0203045  dx_dm5
+2   0.37337683 0.3733525  dx_dm5
+            term    contrast w5_nhdl     estimate  std.error  statistic   p.value   s.value    conf.low  conf.high predicted_lo
+1 delta_w1_w4_GE mean(dY/dX)       0 -0.008097277 0.01147297 -0.7057696 0.4803315 1.0578978 -0.03058389 0.01438934    0.1258819
+2 delta_w1_w4_GE mean(dY/dX)       1  0.016691505 0.04414439  0.3781116 0.7053477 0.5035935 -0.06982991 0.10321292    0.4769655
+  predicted_hi predicted outcome
+1    0.1258780 0.1258799 dx_hld5
+2    0.4769783 0.4769719 dx_hld5

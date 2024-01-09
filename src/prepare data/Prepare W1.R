@@ -4,17 +4,13 @@
 #-------------------------------------------------------------------------
 #
 # load packages ----------------------------------------------------------
-libs <- c("tidyverse", "haven", 'scales')
-
-installed_libs <- libs %in% rownames (installed.packages ())
-if (any (installed_libs == F)) {
-  install.packages (libs[!installed_libs])
-}
-
-invisible(lapply (libs, library, character.only = T))
+library(tidyverse)
+library(haven)
+library(scales)
 
 # Data paths ------------------------------------------------------------
-data_path <- '~/Add Health Data'
+data_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Core Files - Wave I'
+
 inhome_path <-  paste0(data_path, '/Wave I In Home Interview Data')
 weights_path <-  paste0(data_path, '/Wave I In-Home Weights')
 
@@ -89,6 +85,7 @@ wave.1 <- wave.1 %>%
          h1ee2 = ifelse(h1ee2 > 5 | h1ee2 < 1, NA, h1ee2),
          h1fs4 = ifelse(h1fs4 > 3 | h1fs4 < 0, NA, h1fs4),
          h1gh42 = ifelse(h1gh42 > 4 | h1gh42 < 0, NA, h1gh42))
+
 
 # Logistic regression to predict male using GE variables ------------------------
 wave.1$w1_male <- factor(ifelse(wave.1$bio_sex == 1, 1, 0))
