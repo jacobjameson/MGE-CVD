@@ -1,0 +1,13 @@
+[1] "Adult Biomeasure Level (Model 3)"
+# A tibble: 9 × 6
+  outcome        term            Estimate std.error CI              P_Value
+  <fct>          <fct>           <chr>    <chr>     <chr>           <chr>  
+1 Hypertension   Adolescent MGE  0.005    0.017     (-0.029, 0.038) 0.785  
+2 Hypertension   Young Adult MGE -0.021   0.017     (-0.053, 0.012) 0.209  
+3 Hypertension   Change in MGE   -0.014   0.014     (-0.040, 0.013) 0.310  
+4 Diabetes       Adolescent MGE  0.004    0.007     (-0.009, 0.017) 0.567  
+5 Diabetes       Young Adult MGE -0.009   0.006     (-0.021, 0.003) 0.149  
+6 Diabetes       Change in MGE   -0.007   0.006     (-0.018, 0.005) 0.245  
+7 Hyperlipidemia Adolescent MGE  0.004    0.011     (-0.017, 0.025) 0.719  
+8 Hyperlipidemia Young Adult MGE -0.008   0.009     (-0.026, 0.011) 0.418  
+9 Hyperlipidemia Change in MGE   -0.007   0.008     (-0.022, 0.008) 0.364  

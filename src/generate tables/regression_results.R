@@ -15,6 +15,7 @@ library(MASS)
 library(stargazer)
 library(gtsummary)
 library(stargazer)
+library(marginaleffects)
 
 source('src/prepare data/Construct Analytical Dataset.R')
 #----------------------------------------------------------------------------------
@@ -27,19 +28,40 @@ source('src/prepare data/Construct Analytical Dataset.R')
 
 # Function to perform regression and coefficient testing
 run_analysis <- function(data, predictor) {
-  glm_htn <- glm(dx_htn5 ~ get(predictor) + race5 + sespc_al + nhood1_d + ins5 + edu5, 
-                 data = subset(data, in_sample.5 == 1), weights = weights, family = "quasibinomial")
   
-  glm_dm <- glm(dx_dm5 ~ get(predictor) + race5 + sespc_al + nhood1_d + ins5 + edu5, 
-                data = subset(data, in_sample.5 == 1), weights = weights, family = "quasibinomial")
+  # run regressions
+  glm_htn <- glm(dx_htn5 ~ get(predictor) + race5 + sespc_al + 
+                           nhood1_d + ins5 + edu5, 
+                 data = subset(data, in_sample.5 == 1), 
+                 weights = weights, family = "quasibinomial")
   
-  glm_hld <- glm(dx_hld5 ~ get(predictor) + race5 + sespc_al + nhood1_d + ins5 + edu5, 
-                 data = subset(data, in_sample.5 == 1), weights = weights, family = "quasibinomial")
+  glm_dm <- glm(dx_dm5 ~ get(predictor) + race5 + sespc_al + 
+                         nhood1_d + ins5 + edu5,
+                data = subset(data, in_sample.5 == 1), 
+                weights = weights, family = "quasibinomial")
   
-  vcv_robust_htn <- coeftest(x = glm_htn, vcov = vcovCL(glm_htn, type = "HC0", cluster = ~ cluster))
-  vcv_robust_dm <- coeftest(x = glm_dm, vcov = vcovCL(glm_dm, type = "HC0", cluster = ~ cluster))
-  vcv_robust_hld <- coeftest(x = glm_hld, vcov = vcovCL(glm_hld, type = "HC0", cluster = ~ cluster))
+  glm_hld <- glm(dx_hld5 ~ get(predictor) + race5 + sespc_al +
+                           nhood1_d + ins5 + edu5, 
+                 data = subset(data, in_sample.5 == 1), 
+                 weights = weights, family = "quasibinomial")
   
+  # cluster robust standard errors
+  vcv_robust_htn <- coeftest(
+    x = glm_htn, 
+    vcov = vcovCL(glm_htn, type = "HC0", cluster = ~ cluster)
+    )
+  
+  vcv_robust_dm <- coeftest(
+    x = glm_dm, 
+    vcov = vcovCL(glm_dm, type = "HC0", cluster = ~ cluster)
+    )
+  
+  vcv_robust_hld <- coeftest(
+    x = glm_hld, 
+    vcov = vcovCL(glm_hld, type = "HC0", cluster = ~ cluster)
+    )
+  
+  # stargazer table of results
   stargazer(list(vcv_robust_htn, vcv_robust_dm, vcv_robust_hld), type = "text", 
             report = "vc*p", header = FALSE, 
             column.labels = c('Diagnosis HTN', 'Diagnosis DM', 'Diagnosis HLD'),
@@ -57,50 +79,75 @@ ape_analysis <- function(frml, df, weights){
   ape <- avg_slopes(model = m0, vcov = vcv_robust) %>% 
     as.data.frame() %>%
     mutate(outcome = str_squish(word(frml,1,sep = "\\~"))) %>%
-    filter( grepl("male_std", term) | grepl("delta_w1_w4_GE", term))
+    filter( grepl("male_std", term) | grepl("delta_w1_w4_GE", term)) %>%
+    select(outcome, term, estimate, std.error, p.value)
   
   return(ape)
 }
 
 # Start the sink to capture output
-sink("outputs/tables/Wave 5 Dx.txt")
+sink("outputs/tables/Wave 5 Dx Model 1.txt")
 
 predictors <- c("w1.GE_male_std", "w4.GE_male_std", "delta_w1_w4_GE")
+
 for (predictor in predictors) {
   run_analysis(final.df, predictor)
 }
 
 
-ape_analysis('dx_htn5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights)
+ape_analysis(
+  'dx_htn5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights
+  )
 
-ape_analysis('dx_dm5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights)
+ape_analysis(
+  'dx_dm5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights
+  )
 
-ape_analysis('dx_hld5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights)
+ape_analysis(
+  'dx_hld5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights
+  )
 
+ape_analysis(
+  'dx_htn5 ~ w4.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights
+)
 
+ape_analysis(
+  'dx_dm5 ~ w4.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights
+)
 
-ape_analysis('dx_htn5 ~ w4.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights)
+ape_analysis(
+  'dx_hld5 ~ w4.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights
+)
 
-ape_analysis('dx_dm5 ~ w4.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights)
+ape_analysis(
+  'dx_htn5 ~ delta_w1_w4_GE + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights
+)
 
-ape_analysis('dx_hld5 ~ w4.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights)
+ape_analysis(
+  'dx_dm5 ~ delta_w1_w4_GE + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights
+)
 
-
-
-ape_analysis('dx_htn5 ~ delta_w1_w4_GE + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights)
-
-ape_analysis('dx_dm5 ~ delta_w1_w4_GE + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights)
-
-ape_analysis('dx_hld5 ~ delta_w1_w4_GE + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights)
+ape_analysis(
+  'dx_hld5 ~ delta_w1_w4_GE + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights
+)
 
 sink()
 
@@ -114,19 +161,40 @@ sink()
 
 # Function to perform regression and coefficient testing
 run_analysis <- function(data, predictor) {
-  glm_htn <- glm(dx_htn5 ~ get(predictor)*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5, 
-                 data = subset(data, in_sample.5 == 1), weights = weights, family = "quasibinomial")
   
-  glm_dm <- glm(dx_dm5 ~ get(predictor)*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5, 
-                data = subset(data, in_sample.5 == 1), weights = weights, family = "quasibinomial")
+  # run regressions
+  glm_htn <- glm(dx_htn5 ~ get(predictor)*w5_bp + race5 + sespc_al + 
+                           nhood1_d + ins5 + edu5, 
+                 data = subset(data, in_sample.5 == 1), 
+                 weights = weights, family = "quasibinomial")
   
-  glm_hld <- glm(dx_hld5 ~ get(predictor)*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5, 
-                 data = subset(data, in_sample.5 == 1), weights = weights, family = "quasibinomial")
+  glm_dm <- glm(dx_dm5 ~ get(predictor)*w5_a1c + race5 + sespc_al + 
+                         nhood1_d + ins5 + edu5, 
+                data = subset(data, in_sample.5 == 1), 
+                weights = weights, family = "quasibinomial")
   
-  vcv_robust_htn <- coeftest(x = glm_htn, vcov = vcovCL(glm_htn, type = "HC0", cluster = ~ cluster))
-  vcv_robust_dm <- coeftest(x = glm_dm, vcov = vcovCL(glm_dm, type = "HC0", cluster = ~ cluster))
-  vcv_robust_hld <- coeftest(x = glm_hld, vcov = vcovCL(glm_hld, type = "HC0", cluster = ~ cluster))
+  glm_hld <- glm(dx_hld5 ~ get(predictor)*w5_nhdl + race5 + sespc_al + 
+                           nhood1_d + ins5 + edu5, 
+                 data = subset(data, in_sample.5 == 1), 
+                 weights = weights, family = "quasibinomial")
   
+  # cluster robust standard errors
+  vcv_robust_htn <- coeftest(
+    x = glm_htn, 
+    vcov = vcovCL(glm_htn, type = "HC0", cluster = ~ cluster)
+    )
+  
+  vcv_robust_dm <- coeftest(
+    x = glm_dm, 
+    vcov = vcovCL(glm_dm, type = "HC0", cluster = ~ cluster)
+    )
+  
+  vcv_robust_hld <- coeftest(
+    x = glm_hld, 
+    vcov = vcovCL(glm_hld, type = "HC0", cluster = ~ cluster)
+    )
+  
+  # output results
   stargazer(list(vcv_robust_htn, vcv_robust_dm, vcv_robust_hld), type = "text", 
             report = "vc*p", header = FALSE, 
             column.labels = c('Diagnosis HTN', 'Diagnosis DM', 'Diagnosis HLD'),
@@ -144,13 +212,14 @@ ape_analysis <- function(frml, df, weights, var, by){
   ape <- avg_slopes(model = m0, vcov = vcv_robust, 
                     variables = var, by = by) %>%
     as.data.frame() %>%
-    mutate(outcome = str_squish(word(frml,1,sep = "\\~")))
+    mutate(outcome = str_squish(word(frml,1,sep = "\\~"))) %>%
+    select(outcome, term, estimate, std.error, p.value, by)
   
   return(ape)
 }
 
 # Start the sink to capture output
-sink("outputs/tables/Wave 5 Dx Controling for Bio.txt")
+sink("outputs/tables/Wave 5 Dx Controling for Bio Model 2.txt")
 
 predictors <- c("w1.GE_male_std", "w4.GE_male_std", "delta_w1_w4_GE")
 for (predictor in predictors) {
@@ -158,48 +227,68 @@ for (predictor in predictors) {
 }
 
 
-ape_analysis('dx_htn5 ~ w1.GE_male_std*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights,
-             'w1.GE_male_std', 'w5_bp')
+ape_analysis(
+  'dx_htn5 ~ w1.GE_male_std*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights,
+  'w1.GE_male_std', 'w5_bp')
 
-ape_analysis('dx_dm5 ~ w1.GE_male_std*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights,
-             'w1.GE_male_std', 'w5_a1c')
+ape_analysis(
+  'dx_dm5 ~ w1.GE_male_std*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights,
+  'w1.GE_male_std', 'w5_a1c')
 
-ape_analysis('dx_hld5 ~ w1.GE_male_std*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights,
-             'w1.GE_male_std', 'w5_nhdl')
+ape_analysis(
+  'dx_hld5 ~ w1.GE_male_std*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights,
+  'w1.GE_male_std', 'w5_nhdl')
 
+ape_analysis(
+  'dx_htn5 ~ w4.GE_male_std*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights,
+  'w4.GE_male_std', 'w5_bp')
 
-ape_analysis('dx_htn5 ~ w4.GE_male_std*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights,
-             'w4.GE_male_std', 'w5_bp')
+ape_analysis(
+  'dx_dm5 ~ w4.GE_male_std*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights,
+  'w4.GE_male_std', 'w5_a1c')
 
-ape_analysis('dx_dm5 ~ w4.GE_male_std*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights,
-             'w4.GE_male_std', 'w5_a1c')
+ape_analysis(
+  'dx_hld5 ~ w4.GE_male_std*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights,
+  'w4.GE_male_std', 'w5_nhdl')
 
-ape_analysis('dx_hld5 ~ w4.GE_male_std*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights,
-             'w4.GE_male_std', 'w5_nhdl')
+ape_analysis(
+  'dx_htn5 ~ delta_w1_w4_GE*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights,
+  'delta_w1_w4_GE', 'w5_bp')
 
+ape_analysis(
+  'dx_dm5 ~ delta_w1_w4_GE*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights,
+  'delta_w1_w4_GE', 'w5_a1c')
 
-ape_analysis('dx_htn5 ~ delta_w1_w4_GE*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights,
-             'delta_w1_w4_GE', 'w5_bp')
-
-ape_analysis('dx_dm5 ~ delta_w1_w4_GE*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights,
-             'delta_w1_w4_GE', 'w5_a1c')
-
-ape_analysis('dx_hld5 ~ delta_w1_w4_GE*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5', 
-             subset(final.df, in_sample.5 == 1), subset(final.df, in_sample.5 == 1)$weights,
-             'delta_w1_w4_GE', 'w5_nhdl')
+ape_analysis(
+  'dx_hld5 ~ delta_w1_w4_GE*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5', 
+  subset(final.df, in_sample.5 == 1), 
+  subset(final.df, in_sample.5 == 1)$weights,
+  'delta_w1_w4_GE', 'w5_nhdl')
 
 
 sink()
 
 # Stratified -----------------------------------------------------------------------------------
+
+
+
+
 
 suppressWarnings({
     for (i in seq_along(outcomes)) {

@@ -1,0 +1,13 @@
+[1] "Adult Medication Use in Men by Report (+) Diagnosis (Model 5)"
+# A tibble: 9 × 6
+  outcome        term            Estimate std.error CI               P_Value
+  <fct>          <fct>           <chr>    <chr>     <chr>            <chr>  
+1 Hypertension   Adolescent MGE  -0.029   0.026     (-0.080, 0.022)  0.264  
+2 Hypertension   Young Adult MGE -0.066   0.032     (-0.130, -0.003) 0.041  
+3 Hypertension   Change in MGE   -0.014   0.019     (-0.051, 0.022)  0.447  
+4 Diabetes       Adolescent MGE  -0.021   0.035     (-0.089, 0.047)  0.550  
+5 Diabetes       Young Adult MGE -0.053   0.060     (-0.170, 0.063)  0.369  
+6 Diabetes       Change in MGE   -0.008   0.013     (-0.034, 0.018)  0.542  
+7 Hyperlipidemia Adolescent MGE  0.024    0.045     (-0.065, 0.113)  0.600  
+8 Hyperlipidemia Young Adult MGE -0.019   0.052     (-0.121, 0.083)  0.717  
+9 Hyperlipidemia Change in MGE   -0.024   0.042     (-0.106, 0.058)  0.567  
