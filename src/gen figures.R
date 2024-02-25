@@ -251,5 +251,3 @@ ggplot(combined_plot_data, aes(x=xvals)) +
 
 ggsave('outputs/figures/figure.2.png', width = 16, height = 10)
 
-
-
