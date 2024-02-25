@@ -33,19 +33,8 @@ rm(list=setdiff(ls(), 'final.df'))
 
 final.df <- final.df %>%
   mutate(
-    above_school_avg = case_when(
-      w1.GE_male >= school_avg_GE ~ 1,
-      w1.GE_male < school_avg_GE ~ 0,
-      TRUE ~ NaN
-    ),
     delta_w1_w4_GE = w4.GE_male_std - w1.GE_male_std,
     increasing = ifelse(delta_w1_w4_GE > 0, 1, 0),
-    school_self = case_when(
-      above_school_avg == 1 & delta_w1_w4_GE > 0 ~ 1,
-      above_school_avg == 1 & delta_w1_w4_GE < 0 ~ 2,
-      above_school_avg == 0 & delta_w1_w4_GE > 0 ~ 3,
-      above_school_avg == 0 & delta_w1_w4_GE < 0 ~ 4
-    ),
     self_self = case_when(
       w1.GE_male_std >= 0 & delta_w1_w4_GE > 0 ~ 1,
       w1.GE_male_std >= 0 & delta_w1_w4_GE < 0 ~ 2,
@@ -76,7 +65,7 @@ vars.keep <- c('dx_cad5', 'dx_htn5', 'dx_dm5', 'dx_hld5',
                'w1.GE_male','w4.GE_male', 
                'w1.GE_male_std', 'w4.GE_male_std',
                'sespc_al', 'nhood1_d', 'race', 
-               'w4_male', 'above_school_avg', 'w5_nhdl',
+               'w4_male', 'w5_nhdl',
                'lipid5cat', 'w5_a1c', 'w5_bp', 'race5_d', 'race5', 'ins5',
                'edu5', 'w5biowgt')
 

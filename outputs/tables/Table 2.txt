@@ -1,26 +1,68 @@
 [1] "Self-Report of Adult Diagnosis (Model 1)"
+[1] "-----------------------------------------------------------------------"
 # A tibble: 9 × 6
-  outcome        term            Estimate std.error CI               P_Value
-  <fct>          <fct>           <chr>    <chr>     <chr>            <chr>  
-1 Hypertension   Adolescent MGE  -0.023   0.009     (-0.042, -0.005) 0.014  
-2 Hypertension   Young Adult MGE -0.038   0.009     (-0.056, -0.020) 0.000  
-3 Hypertension   Change in MGE   -0.008   0.007     (-0.022, 0.007)  0.303  
-4 Diabetes       Adolescent MGE  -0.008   0.005     (-0.017, 0.002)  0.118  
-5 Diabetes       Young Adult MGE -0.013   0.005     (-0.022, -0.003) 0.009  
-6 Diabetes       Change in MGE   -0.003   0.004     (-0.011, 0.006)  0.538  
-7 Hyperlipidemia Adolescent MGE  -0.010   0.008     (-0.026, 0.007)  0.242  
-8 Hyperlipidemia Young Adult MGE -0.024   0.008     (-0.040, -0.008) 0.004  
-9 Hyperlipidemia Change in MGE   -0.008   0.006     (-0.020, 0.005)  0.223  
+  outcome           term            Estimate std.error CI               P_Value
+  <fct>             <fct>           <chr>    <chr>     <chr>            <chr>  
+1 Dx Hypertension   Adolescent MGE  -0.023   0.009     (-0.042, -0.005) 0.014  
+2 Dx Hypertension   Young Adult MGE -0.038   0.009     (-0.056, -0.020) 0.000  
+3 Dx Hypertension   Change in MGE   -0.035   0.009     (-0.054, -0.017) 0.000  
+4 Dx Diabetes       Adolescent MGE  -0.008   0.005     (-0.017, 0.002)  0.118  
+5 Dx Diabetes       Young Adult MGE -0.013   0.005     (-0.022, -0.003) 0.009  
+6 Dx Diabetes       Change in MGE   -0.012   0.005     (-0.022, -0.002) 0.017  
+7 Dx Hyperlipidemia Adolescent MGE  -0.010   0.008     (-0.026, 0.007)  0.242  
+8 Dx Hyperlipidemia Young Adult MGE -0.024   0.008     (-0.040, -0.008) 0.004  
+9 Dx Hyperlipidemia Change in MGE   -0.023   0.008     (-0.039, -0.007) 0.005  
+[1] "-----------------------------------------------------------------------"
+[1] "-----------------------------------------------------------------------"
+[1] "-----------------------------------------------------------------------"
 [1] "Self-Report of Adult Diagnosis Among men with elevated Biomeasure (Model 2)"
+[1] "-----------------------------------------------------------------------"
 # A tibble: 9 × 6
-  outcome        term            Estimate std.error CI               P_Value
-  <fct>          <fct>           <chr>    <chr>     <chr>            <chr>  
-1 Hypertension   Adolescent MGE  -0.022   0.018     (-0.058, 0.013)  0.221  
-2 Hypertension   Young Adult MGE -0.041   0.017     (-0.074, -0.007) 0.019  
-3 Hypertension   Change in MGE   -0.010   0.015     (-0.039, 0.019)  0.488  
-4 Diabetes       Adolescent MGE  -0.137   0.062     (-0.258, -0.015) 0.027  
-5 Diabetes       Young Adult MGE -0.054   0.057     (-0.166, 0.057)  0.339  
-6 Diabetes       Change in MGE   0.058    0.056     (-0.051, 0.167)  0.299  
-7 Hyperlipidemia Adolescent MGE  -0.056   0.059     (-0.173, 0.060)  0.344  
-8 Hyperlipidemia Young Adult MGE -0.043   0.068     (-0.177, 0.090)  0.525  
-9 Hyperlipidemia Change in MGE   0.017    0.044     (-0.070, 0.103)  0.705  
+  outcome           term            Estimate std.error CI               P_Value
+  <fct>             <fct>           <chr>    <chr>     <chr>            <chr>  
+1 Dx Hypertension   Adolescent MGE  -0.022   0.018     (-0.058, 0.013)  0.221  
+2 Dx Hypertension   Young Adult MGE -0.041   0.017     (-0.074, -0.007) 0.019  
+3 Dx Hypertension   Change in MGE   -0.048   0.016     (-0.080, -0.016) 0.004  
+4 Dx Diabetes       Adolescent MGE  -0.137   0.062     (-0.258, -0.015) 0.027  
+5 Dx Diabetes       Young Adult MGE -0.054   0.057     (-0.166, 0.057)  0.339  
+6 Dx Diabetes       Change in MGE   -0.005   0.057     (-0.117, 0.108)  0.933  
+7 Dx Hyperlipidemia Adolescent MGE  -0.056   0.059     (-0.173, 0.060)  0.344  
+8 Dx Hyperlipidemia Young Adult MGE -0.043   0.068     (-0.177, 0.090)  0.525  
+9 Dx Hyperlipidemia Change in MGE   -0.029   0.047     (-0.121, 0.063)  0.541  
+[1] "-----------------------------------------------------------------------"
+[1] "-----------------------------------------------------------------------"
+[1] "-----------------------------------------------------------------------"
+[1] "Biomeasure Evidence of CVD Risks (Model 3)"
+[1] "-----------------------------------------------------------------------"
+# A tibble: 9 × 6
+  outcome                 term            Estimate std.error CI               P_Value
+  <fct>                   <fct>           <chr>    <chr>     <chr>            <chr>  
+1 Anti Hypertension Med   Adolescent MGE  -0.097   0.028     (-0.153, -0.042) 0.001  
+2 Anti Hypertension Med   Young Adult MGE -0.067   0.032     (-0.129, -0.004) 0.036  
+3 Anti Hypertension Med   Change in MGE   -0.021   0.030     (-0.081, 0.038)  0.482  
+4 Anti Diabetes Med       Adolescent MGE  -0.044   0.061     (-0.164, 0.076)  0.472  
+5 Anti Diabetes Med       Young Adult MGE -0.101   0.054     (-0.206, 0.004)  0.059  
+6 Anti Diabetes Med       Change in MGE   -0.085   0.050     (-0.182, 0.012)  0.087  
+7 Anti Hyperlipidemia Med Adolescent MGE  0.020    0.027     (-0.033, 0.073)  0.458  
+8 Anti Hyperlipidemia Med Young Adult MGE 0.008    0.024     (-0.038, 0.055)  0.733  
+9 Anti Hyperlipidemia Med Change in MGE   -0.000   0.022     (-0.044, 0.043)  0.983  
+[1] "-----------------------------------------------------------------------"
+[1] "-----------------------------------------------------------------------"
+[1] "-----------------------------------------------------------------------"
+[1] "Treatment of CVD Risks (Model 4)"
+[1] "-----------------------------------------------------------------------"
+# A tibble: 9 × 6
+  outcome                  term            Estimate std.error CI              P_Value
+  <fct>                    <fct>           <chr>    <chr>     <chr>           <chr>  
+1 Biomarker Hypertension   Adolescent MGE  0.005    0.017     (-0.029, 0.038) 0.785  
+2 Biomarker Hypertension   Young Adult MGE -0.021   0.017     (-0.053, 0.012) 0.209  
+3 Biomarker Hypertension   Change in MGE   -0.022   0.017     (-0.055, 0.012) 0.201  
+4 Biomarker Diabetes       Adolescent MGE  0.004    0.007     (-0.009, 0.017) 0.567  
+5 Biomarker Diabetes       Young Adult MGE -0.009   0.006     (-0.021, 0.003) 0.149  
+6 Biomarker Diabetes       Change in MGE   -0.009   0.006     (-0.022, 0.003) 0.141  
+7 Biomarker Hyperlipidemia Adolescent MGE  0.004    0.011     (-0.017, 0.025) 0.719  
+8 Biomarker Hyperlipidemia Young Adult MGE -0.008   0.009     (-0.026, 0.011) 0.418  
+9 Biomarker Hyperlipidemia Change in MGE   -0.009   0.009     (-0.027, 0.010) 0.361  
+[1] "-----------------------------------------------------------------------"
+[1] "-----------------------------------------------------------------------"
+[1] "-----------------------------------------------------------------------"
