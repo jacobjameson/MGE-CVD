@@ -22,7 +22,7 @@ Main measures: MGE was assessed in adolescence and young adulthood using a valid
 
 ## Key Figures
 
-![](https://github.com/jacobjameson/MGE-CVD/blob/main/outputs/figures/Figure%201.png)
-![](https://github.com/jacobjameson/MGE-CVD/blob/main/outputs/figures/Figure%201.png)
+![](https://github.com/jacobjameson/MGE-CVD/blob/main/outputs/figures/figure.1.png)
+![](https://github.com/jacobjameson/MGE-CVD/blob/main/outputs/figures/figure.2.png)
 
 
