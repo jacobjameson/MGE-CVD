@@ -1,0 +1,429 @@
+
+> cat("Log started: ", date(), "\n\n")
+Log started:  Sun Mar 24 13:59:32 2024 
+
+
+> library(lmtest)
+
+> library(sandwich)
+
+> library(broom)
+
+> library(tidyverse)
+
+> library(sjstats)
+
+> library(stargazer)
+
+> library(marginaleffects)
+
+> library(gtsummary)
+
+> library(ggeffects)
+
+> library(ggsci)
+
+> library(haven)
+
+> library(labelled)
+
+> library(scales)
+
+> # Run all scripts -------------------------------------------------------------
+> ## Generate data
+> source("src/prepare data/Construct Analytical d ..." ... [TRUNCATED] 
+
+> ################################################################################
+> # AUTHOR:             Jacob Jameson
+> #
+> # DESCRIPTION:        T .... [TRUNCATED] 
+
+> source('src/prepare data/Prepare W4.R')
+
+> source('src/prepare data/Prepare W5.R')
+
+> # Get SES data
+> ses_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Constructed Files/Constructed SES Variables'
+
+> ses.data <- read_xpt(paste0(ses_path, '/conses4.xpt'))
+
+> names(ses.data) <- tolower(names(ses.data))
+
+> # Merge wave 1, wave 4, wave 5, and SES data together
+> final.df <- merge(wave.1, wave.4, by=c('aid', 'psuscid', 'region'), all=TRUE)
+
+> final.df <- merge(final.df, wave.5, by=c('aid', 'psuscid', 'region'), all=TRUE)
+
+> final.df <- merge(final.df, ses.data, by='aid')
+
+> # Clear environment
+> rm(list=setdiff(ls(), 'final.df'))
+
+> ################################################################################
+> # CREATE VARIABLES THAT WILL BE USED IN ANALYSIS:
+> ############# .... [TRUNCATED] 
+
+> final.df$self_self <- factor(
++   final.df$self_self,
++   levels = c(1, 2, 3, 4),
++   labels = c(
++     "Above Adolescent Male Avg and Increasing",
+ .... [TRUNCATED] 
+
+> ################################################################################
+> # Determine what variables to keep for analysis
+> 
+> vars.keep <- .... [TRUNCATED] 
+
+> final.df <- final.df[, vars.keep]
+
+> # Create a binary variable indicating whether a respondent is in the sample
+> final.df <- final.df %>%
++   mutate(in_sample = ifelse(w1_male == w4_m .... [TRUNCATED] 
+
+> #create cluster var
+> final.df$cluster <- paste(final.df$region,final.df$psuscid)
+
+> final.df$weights <- final.df$gsw5 / mean(final.df$gsw5, na.rm = T)
+
+> final.df$weights.bio <- final.df$w5biowgt / mean(final.df$w5biowgt, na.rm = T)
+
+> ## Run models
+> source("src/gen tables.R", echo = TRUE)
+
+> ################################################################################
+> # AUTHOR:             Jacob Jameson
+> #
+> # DESCRIPTION:        T .... [TRUNCATED] 
+
+> # function to generate marginal effects coefficients (dy/dx) by group
+> ape_analysis_by <- function(frml, df, weights, by){
++   
++   frml1 <- as.for .... [TRUNCATED] 
+
+> ## Model 1 --------------------------------------------------------------------
+> 
+> # Define the subset and weights
+> subset_df <- subset(final.df, .... [TRUNCATED] 
+
+> subset_weights <- subset_df$weights
+
+> ### Formulas
+> 
+> formulas_htn <- c(
++   'dx_htn5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'dx_htn5 ~ w4.GE_male_std + rac .... [TRUNCATED] 
+
+> formulas_dm <- c(
++   'dx_dm5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'dx_dm5 ~ w4.GE_male_std + race5 + sespc_al + nhood .... [TRUNCATED] 
+
+> formulas_hld <- c(
++   'dx_hld5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'dx_hld5 ~ w4.GE_male_std + race5 + sespc_al + nh .... [TRUNCATED] 
+
+> # Perform analysis 
+> results_htn <- map_dfr(
++   formulas_htn, ~ ape_analysis(.x, subset_df, subset_weights)
++   ) %>%
++   mutate(outcome = 'Dx Hyp .... [TRUNCATED] 
+
+> results_dm <- map_dfr(
++   formulas_dm, ~ ape_analysis(.x, subset_df, subset_weights)
++ ) %>%
++   mutate(outcome = 'Dx Diabetes')
+
+> results_hld <- map_dfr(
++   formulas_hld, ~ ape_analysis(.x, subset_df, subset_weights)
++ ) %>%
++   mutate(outcome = 'Dx Hyperlipidemia')
+
+> # append data frames
+> results <- bind_rows(results_hld, results_htn, results_dm)
+
+> model.1 <- results %>%
++   mutate(term = case_when(
++     grepl("w1.GE_male_std", term) ~ "Adolescent MGE",
++     grepl("w4.GE_male_std", term) ~ "Y ..." ... [TRUNCATED] 
+
+> ## Model 2 --------------------------------------------------------------------
+> 
+> # Define the subset and weights
+> subset_df <- subset(final.df, .... [TRUNCATED] 
+
+> subset_weights <- subset_df$weights
+
+> formulas_htn <- c(
++   'dx_htn5 ~ w1.GE_male_std + w5_bp + w1.GE_male_std*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'dx_htn5 ~ w4.GE_m .... [TRUNCATED] 
+
+> formulas_dm <- c(
++   'dx_dm5 ~ w1.GE_male_std + w5_a1c + w1.GE_male_std*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'dx_dm5 ~ w4.GE_ma .... [TRUNCATED] 
+
+> formulas_hld <- c(
++   'dx_hld5 ~ w1.GE_male_std + w5_nhdl + w1.GE_male_std*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'dx_hld5 ~ w4. .... [TRUNCATED] 
+
+> # Perform analysis 
+> results_htn <- map_dfr(
++   formulas_htn, ~ ape_analysis_by(.x, subset_df, subset_weights, 'w5_bp')
++ ) %>%
++   mutate(outcome .... [TRUNCATED] 
+
+> results_dm <- map_dfr(
++   formulas_dm, ~ ape_analysis_by(.x, subset_df, subset_weights, 'w5_a1c')
++ ) %>%
++   mutate(outcome = 'Dx Diabetes') %>%
++ .... [TRUNCATED] 
+
+> results_hld <- map_dfr(
++   formulas_hld, ~ ape_analysis_by(.x, subset_df, subset_weights, 'w5_nhdl')
++ ) %>%
++   mutate(outcome = 'Dx Hyperlipidemi .... [TRUNCATED] 
+
+> # append data frames
+> results <- bind_rows(results_hld, results_htn, results_dm)
+
+> model.2 <- results %>%
++   mutate(term = case_when(
++     grepl("w1.GE_male_std", term) ~ "Adolescent MGE",
++     grepl("w4.GE_male_std", term) ~ "Y ..." ... [TRUNCATED] 
+
+> ## Model 3 --------------------------------------------------------------------
+> 
+> # Define the subset and weights
+> subset_df <- subset(final.df, .... [TRUNCATED] 
+
+> subset_weights <- subset_df$weights
+
+> formulas_htn <- c(
++   'w5_anti_htn ~ w1.GE_male_std + w1.GE_male_std*dx_htn5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'w5_anti_htn ~ w4.GE .... [TRUNCATED] 
+
+> formulas_dm <- c(
++   'w5_anti_dm_med_use ~ w1.GE_male_std + w1.GE_male_std*dx_dm5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'w5_anti_dm_med .... [TRUNCATED] 
+
+> formulas_hld <- c(
++   'w5_anti_hld_med_use ~ w1.GE_male_std + w1.GE_male_std*dx_hld5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'w5_anti_hld .... [TRUNCATED] 
+
+> # Perform analysis 
+> results_htn <- map_dfr(
++   formulas_htn, ~ ape_analysis_by(.x, subset_df, subset_weights, 'dx_htn5')
++ ) %>%
++   mutate(outco .... [TRUNCATED] 
+
+> results_dm <- map_dfr(
++   formulas_dm, ~ ape_analysis_by(.x, subset_df, subset_weights, 'dx_dm5')
++ ) %>%
++   mutate(outcome = 'Anti Diabetes Med') .... [TRUNCATED] 
+
+> results_hld <- map_dfr(
++   formulas_hld, ~ ape_analysis_by(.x, subset_df, subset_weights, 'dx_hld5')
++ ) %>%
++   mutate(outcome = 'Anti Hyperlipide .... [TRUNCATED] 
+
+> # append data frames
+> results <- bind_rows(results_hld, results_htn, results_dm)
+
+> model.3 <- results %>%
++   mutate(term = case_when(
++     grepl("w1.GE_male_std", term) ~ "Adolescent MGE",
++     grepl("w4.GE_male_std", term) ~ "Y ..." ... [TRUNCATED] 
+
+> ## Model 4 --------------------------------------------------------------------
+> 
+> # Define the subset and weights
+> subset_df <- subset(final.df, .... [TRUNCATED] 
+
+> subset_weights <- subset_df$weights
+
+> formulas_htn <- c(
++   'w5_bp ~ w1.GE_male_std + w5_anti_htn + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'w5_bp ~ w4.GE_male_std + w5_anti_htn .... [TRUNCATED] 
+
+> formulas_dm <- c(
++   'w5_a1c ~ w1.GE_male_std + w5_anti_dm_med_use + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'w5_a1c ~ w4.GE_male_std + w5_ .... [TRUNCATED] 
+
+> formulas_hld <- c(
++   'w5_nhdl ~ w1.GE_male_std + w5_anti_hld_med_use + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'w5_nhdl ~ w4.GE_male_std + .... [TRUNCATED] 
+
+> # Perform analysis 
+> results_htn <- map_dfr(
++   formulas_htn, ~ ape_analysis(.x, subset_df, subset_weights)
++ ) %>%
++   mutate(outcome = 'Biomarke .... [TRUNCATED] 
+
+> results_dm <- map_dfr(
++   formulas_dm, ~ ape_analysis(.x, subset_df, subset_weights)
++ ) %>%
++   mutate(outcome = 'Biomarker Diabetes')
+
+> results_hld <- map_dfr(
++   formulas_hld, ~ ape_analysis(.x, subset_df, subset_weights)
++ ) %>%
++   mutate(outcome = 'Biomarker Hyperlipidemia')
+
+> # append data frames
+> results <- bind_rows(results_hld, results_htn, results_dm)
+
+> model.4 <- results %>%
++   mutate(term = case_when(
++     grepl("w1.GE_male_std", term) ~ "Adolescent MGE",
++     grepl("w4.GE_male_std", term) ~ "Y ..." ... [TRUNCATED] 
+
+> ################################################################################
+> # in each model add stars to estimates depending on significance  .... [TRUNCATED] 
+
+> model.1$Estimate <- paste0(model.1$Estimate, model.1$stars)
+
+> model.2 <- model.2 %>%
++   mutate(
++     stars = case_when(
++       P_Value < 0.001 ~ "***",
++       P_Value < 0.01 ~ "**",
++       P_Value < 0.05 ~ .... [TRUNCATED] 
+
+> model.2$Estimate <- paste0(model.2$Estimate, model.2$stars)
+
+> model.3 <- model.3 %>%
++   mutate(
++     stars = case_when(
++       P_Value < 0.001 ~ "***",
++       P_Value < 0.01 ~ "**",
++       P_Value < 0.05 ~ .... [TRUNCATED] 
+
+> model.3$Estimate <- paste0(model.3$Estimate, model.3$stars)
+
+> model.4 <- model.4 %>%
++   mutate(
++     stars = case_when(
++       P_Value < 0.001 ~ "***",
++       P_Value < 0.01 ~ "**",
++       P_Value < 0.05 ~ .... [TRUNCATED] 
+
+> model.4$Estimate <- paste0(model.4$Estimate, model.4$stars)
+
+> # Start the sink to capture output
+> sink("outputs/tables/Table 2.txt")
+
+> ## Generate figures
+> source("src/gen figures.R", echo = TRUE)
+
+> ################################################################################
+> # AUTHOR:             Jacob Jameson
+> #
+> # DESCRIPTION:        T .... [TRUNCATED] 
+
+> subset_weights <- subset_df$weights
+
+> formulas_htn <- c(
++   'dx_htn5 ~ w1.GE_male_std + w5_bp + w1.GE_male_std*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'dx_htn5 ~ w4.GE_m .... [TRUNCATED] 
+
+> formulas_dm <- c(
++   'dx_dm5 ~ w1.GE_male_std + w5_a1c + w1.GE_male_std*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'dx_dm5 ~ w4.GE_ma .... [TRUNCATED] 
+
+> formulas_hld <- c(
++   'dx_hld5 ~ w1.GE_male_std + w5_nhdl + w1.GE_male_std*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'dx_hld5 ~ w4. .... [TRUNCATED] 
+
+> plot_data_frames <- list() 
+
+> for (FORMULA in c(formulas_htn, formulas_dm, formulas_hld)) {
++   model <- glm(FORMULA,
++                data = subset_df, 
++                weights .... [TRUNCATED] 
+
+> # Combine all plot data frames into one
+> combined_plot_data <- do.call(rbind, plot_data_frames)
+
+> # rename the model type if w1.GE_male_std then Adolescent MGE
+> combined_plot_data <- combined_plot_data %>%
++   mutate(model_type = case_when(
++    .... [TRUNCATED] 
+
+> combined_plot_data$model_outcome <- factor(
++   combined_plot_data$model_outcome, levels = c('Hypertension Awareness',
++                             .... [TRUNCATED] 
+
+> combined_plot_data$model_type <- factor(
++   combined_plot_data$model_type, 
++   levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Youn .... [TRUNCATED] 
+
+> ggplot(combined_plot_data, aes(x=xvals)) +
++   geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_type), alpha=0.5) +
++   geom_line(aes(y=coef)) + 
+ .... [TRUNCATED] 
+
+> # save plot with white background
+> ggsave('outputs/figures/figure.1.png', width = 12, height = 11)
+
+> ################################################################################
+> 
+> # Define the subset and weights
+> subset_df <- subset(final.df .... [TRUNCATED] 
+
+> subset_weights <- subset_df$weights
+
+> formulas_htn <- c(
++   'w5_anti_htn ~ w1.GE_male_std + dx_htn5 + w1.GE_male_std*dx_htn5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'w5_anti_h .... [TRUNCATED] 
+
+> formulas_dm <- c(
++   'w5_anti_dm_med_use ~ w1.GE_male_std + dx_dm5 + w1.GE_male_std*dx_dm5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'w5_an .... [TRUNCATED] 
+
+> formulas_hld <- c(
++   'w5_anti_hld_med_use ~ w1.GE_male_std + dx_hld5 + w1.GE_male_std*dx_hld5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
++   'w .... [TRUNCATED] 
+
+> plot_data_frames <- list() 
+
+> for (FORMULA in c(formulas_htn, formulas_dm, formulas_hld)) {
++   model <- glm(FORMULA,
++                data = subset_df, 
++                weights .... [TRUNCATED] 
+
+> # Combine all plot data frames into one
+> combined_plot_data <- do.call(rbind, plot_data_frames)
+
+> # rename the model type if w1.GE_male_std then Adolescent MGE
+> combined_plot_data <- combined_plot_data %>%
++   mutate(model_type = case_when(
++    .... [TRUNCATED] 
+
+> combined_plot_data$model_outcome <- factor(
++   combined_plot_data$model_outcome, levels = c('Treatment of Hypertension',
++                          .... [TRUNCATED] 
+
+> combined_plot_data$model_type <- factor(
++   combined_plot_data$model_type, 
++   levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Youn .... [TRUNCATED] 
+
+> ggplot(combined_plot_data, aes(x=xvals)) +
++   geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_type), alpha=0.5) +
++   geom_line(aes(y=coef)) + 
+ .... [TRUNCATED] 
+
+> ggsave('outputs/figures/figure.2.png', width = 12, height = 11)
+
+> # End logging -----------------------------------------------------------------
+> cat("\nAll scripts have been executed successfully. 
++     Outputs ..." ... [TRUNCATED] 
+
+All scripts have been executed successfully. 
+    Outputs are available in the outputs directory.
+
+> cat("Log ended: ", date(), "\n")
+Log ended:  Sun Mar 24 14:00:00 2024 
+
+> # Stop logging
+> sink(type = "message") # Stop diverting messages to log file
+
+> sink() # Stop diverting output to log file
