@@ -1,25 +1,27 @@
-## Associations of Male Gender Expressivity with Cardiovascular Disease Risk Awareness and Preventive Treatment in Men
+# Male Gender Expressivity and Awareness and Treatment of Cardiovascular Disease Risks in Men
+## The Way to a Man’s Heart Disease
 
 Authors: Nathaniel J. Glasser, MD; Jacob C. Jameson, MS; Elbert S. Huang, MD; Ian M. Kronish, MD; Stacy Tessler Lindau, MD,; Monica Peek, MD; Elizabeth L. Tung, MD; Harold A. Pollack, PhD
 
 *Keywords: Gender, Masculinity, Identity, Cardiovascular Disease, Risk Reduction, Disease Prevention, Chronic Disease, Management, Social Determinants of Health*
 
-## Abstract
+## Key Points
 
-**Background**: Traditional male gender expression (MGE) has been associated with adverse health outcomes. Yet little is known about associations of MGE with cardiovascular disease (CVD). 
+Question:  What is the association of male gender expressivity (MGE) – a measure reflecting sociocultural pressures around masculinity – with awareness and treatment of modifiable cardiovascular disease risks?
 
-**Objective**: To investigate associations of MGE with individual-level CVD risk awareness and treatment in men.
+Findings: This cohort study involving 4,230 male participants found elevations in adolescent MGE were significantly associated with an 11% lower probability of adult hypertension treatment and a 15% lower probability of adult diabetes awareness. Elevations in young adult MGE were associated with lower probabilities of adult hypertension awareness, hypertension treatment, and diabetes treatment. 
+ 
+Meaning:  Sociocultural pressures to perform masculinity may lead to worse cardiovascular disease outcomes through associations with decreased awareness and treatment of modifiable risks.
 
-**Design**: Nationally-representative, longitudinal cohort study.
+## Project Reproducibility with `renv`
 
-**Participants**:  Male adolescents (aged 12-18; 1994-1995) followed longitudinally through young adulthood (24-32; 2008-2009) and adulthood (33-43; 2016-2018).
+This project utilizes `renv` for R dependency management to ensure reproducibility. `renv` captures the exact versions of R packages used, enabling consistent execution of scripts across different environments.
 
-**Main measures**: MGE was assessed in adolescence and young adulthood using a validated measurement technique. CVD risk awareness was assessed in adults by self-reported diagnoses of hypertension, diabetes, or hyperlipidemia among participants with elevated blood pressure, hemoglobin A1c, or non-HDL cholesterol, respectively. Treatment was measured by self-reported antihypertensive, hypoglycemic, or lipid-lowering medication use among participants reporting hypertension, diabetes, or hyperlipemia, respectively. Multivariable regression was used to model associations of adolescent and young adult MGE with adult CVD risk awareness and treatment. 
+### Execution
+Execute `source("run_all.R")` to run the analyses. Outputs are generated in the `outputs` directory.
 
-**Key Results**: Among 4,230 eligible participants, higher adolescent MGE was not associated with hypertension awareness, but young adult MGE was. By contrast, higher adolescent, but not young adult, MGE was associated with lower diabetes awareness. Neither adolescent nor young adult MGE was associated with hyperlipidemia awareness. In adult men who reported having hypertension diagnoses, higher adolescent and young adult MGE were associated with lower hypertension treatment. In adult men who reported diabetes, adolescent MGE was not associated with diabetes treatment, but young adult MGE was. MGE was not associated with hyperlipidemia treatment. 
-
-**Conclusions**: Higher MGE among adolescent and young adult men predicted lower adult hypertension and diabetes awareness and treatment. MGE may be an overlooked factor influencing CVD morbidity and mortality. 
-
+### Support
+For issues related to project setup or execution, contact Jacob Jameson at jacobjameson@g.harvard.edu.
 
 
 ## Key Figures
