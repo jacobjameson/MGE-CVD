@@ -1,29 +1,12 @@
-#-------------------------------------------------------------------------------
+################################################################################
 # AUTHOR:             Jacob Jameson
-# PURPOSE:            Generate main figures
-#-------------------------------------------------------------------------------
-
-rm(list = ls())
-
-# load packages ---------------------------------------------------------------
-
-library(lmtest)
-library(sandwich)
-library(broom)
-library(tidyverse)
-library(sjstats)
-library(MASS)
-library(stargazer)
-library(gtsummary)
-library(stargazer)
-library(marginaleffects)
-library(ggeffects)
-library(ggsci)
-
-
-# load data --------------------------------------------------------------------
-source('src/prepare data/Construct Analytical Dataset.R')
-
+#
+# DESCRIPTION:        This script generates the figures for the paper.
+#
+# DEPENDENCIES:       The script requires the following dataset:
+#                     -final.df, which is the final dataset constructed by 
+#                      executing scr/prepare data/Construct Analytical dataset.R
+################################################################################
 
 # Define the subset and weights
 subset_df <- subset(final.df, in_sample.bio == 1)

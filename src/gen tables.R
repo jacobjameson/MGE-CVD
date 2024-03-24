@@ -1,25 +1,12 @@
-#-------------------------------------------------------------------------------
+################################################################################
 # AUTHOR:             Jacob Jameson
-# PURPOSE:            Generate main regression results
-#-------------------------------------------------------------------------------
-
-rm(list = ls())
-
-# load packages ---------------------------------------------------------------
-
-library(lmtest)
-library(sandwich)
-library(broom)
-library(tidyverse)
-library(sjstats)
-library(MASS)
-library(stargazer)
-library(gtsummary)
-library(stargazer)
-library(marginaleffects)
-
-# load data --------------------------------------------------------------------
-source('src/prepare data/Construct Analytical Dataset.R')
+#
+# DESCRIPTION:        This script generates the tables for the paper.
+# 
+# DEPENDENCIES:       The script requires the following dataset:
+#                     -final.df, which is the final dataset constructed by 
+#                      executing scr/prepare data/Construct Analytical dataset.R
+################################################################################
 
 #-------------------------------------------------------------------------------
 ################################################################################

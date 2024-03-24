@@ -1,13 +1,12 @@
 ################################################################################
-# AUTHOR:             JACOB JAMESON
-# PURPOSE:            CONSTRUCT W1,W4,W5 Analytical Dataset
+# AUTHOR:             Jacob Jameson
+#
+# DESCRIPTION:        This script constructs the analytical dataset that will be 
+#                     used for the analysis. The script merges the wave 1, 
+#                     wave 4, wave 5, and SES data together.
+#
+# DEPENDENCIES:       Prepare W1.R, Prepare W4.R, Prepare W5.R
 ################################################################################
-
-# Load packages necessary for preparing final data
-library(tidyverse)
-library(haven)
-library(labelled)
-library(scales)
 
 # Create and prepare wave 1 and wave 4 data
 source('src/prepare data/Prepare W1.R')
@@ -84,5 +83,3 @@ final.df <- final.df %>%
 final.df$cluster <- paste(final.df$region,final.df$psuscid)
 final.df$weights <- final.df$gsw5 / mean(final.df$gsw5, na.rm = T)
 final.df$weights.bio <- final.df$w5biowgt / mean(final.df$w5biowgt, na.rm = T)
-
-################################################################################

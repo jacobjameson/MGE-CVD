@@ -1,12 +1,10 @@
-#-------------------------------------------------------------------------
+################################################################################
 # AUTHOR:             Jacob Jameson
-# PURPOSE:            Construct and Prepare Wave 5
-#-------------------------------------------------------------------------
 #
-# load packages ----------------------------------------------------------
-library(tidyverse)
-library(haven)
-library(scales)
+# DESCRIPTION:        This script constructs the analytical dataset that will be
+#                     used for the analysis. The script merges the wave 5 data
+#                     with the biomarker data.
+################################################################################
 
 # Data paths ------------------------------------------------------------
 data_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Core Files - Wave V'

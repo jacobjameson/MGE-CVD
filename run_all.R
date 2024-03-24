@@ -3,6 +3,8 @@
 #
 # DESCRIPTION:        This script loads all necessary packages for the project 
 #                     and runs all other scripts necessary for the project.
+#
+# R version:           4.3.2 (2023-10-31)
 ################################################################################
 
 # Start logging ---------------------------------------------------------------

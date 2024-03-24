@@ -1,12 +1,11 @@
-#-------------------------------------------------------------------------
+################################################################################
 # AUTHOR:             Jacob Jameson
-# PURPOSE:            Construct and Prepare Wave 1
-#-------------------------------------------------------------------------
 #
-# load packages ----------------------------------------------------------
-library(tidyverse)
-library(haven)
-library(scales)
+# DESCRIPTION:        This script constructs the analytical dataset that will be
+#                     used for the analysis. The script merges the wave 1 data
+#                     with the wave 1 weights. The script also creates the variables
+#                     that will be used in the analysis.
+################################################################################
 
 # Data paths ------------------------------------------------------------
 data_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Core Files - Wave I'
