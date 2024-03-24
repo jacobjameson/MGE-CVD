@@ -37,7 +37,7 @@ ape_analysis <- function(frml, df, weights){
   model <- glm(formula = frml1, data = df, 
             weights = weights, family = "quasibinomial")
   
-  vcv_robust <- vcovHC(model, type = "HC0", cluster = ~ cluster)
+  vcv_robust <- vcovHC(model, type = "HC1", cluster = ~ cluster)
   
   ape <- avg_slopes(model = model, vcov = vcv_robust) %>% 
     as.data.frame() %>%
@@ -325,6 +325,53 @@ model.4 <- results %>%
                 ", ", formatC(mean(conf.high), format = "f", digits = 3), ")"),
     P_Value = formatC(mean(p.value), format = "f", digits = 3)) %>%
   ungroup()
+
+################################################################################
+# in each model add stars to estimates depending on significance level
+################################################################################
+model.1 <- model.1 %>%
+  mutate(
+    stars = case_when(
+      P_Value < 0.001 ~ "***",
+      P_Value < 0.01 ~ "**",
+      P_Value < 0.05 ~ "*",
+      TRUE ~ ""
+    )
+  )
+model.1$Estimate <- paste0(model.1$Estimate, model.1$stars)
+
+model.2 <- model.2 %>%
+  mutate(
+    stars = case_when(
+      P_Value < 0.001 ~ "***",
+      P_Value < 0.01 ~ "**",
+      P_Value < 0.05 ~ "*",
+      TRUE ~ ""
+    )
+  )
+model.2$Estimate <- paste0(model.2$Estimate, model.2$stars)
+
+model.3 <- model.3 %>%
+  mutate(
+    stars = case_when(
+      P_Value < 0.001 ~ "***",
+      P_Value < 0.01 ~ "**",
+      P_Value < 0.05 ~ "*",
+      TRUE ~ ""
+    )
+  )
+model.3$Estimate <- paste0(model.3$Estimate, model.3$stars)
+
+model.4 <- model.4 %>%
+  mutate(
+    stars = case_when(
+      P_Value < 0.001 ~ "***",
+      P_Value < 0.01 ~ "**",
+      P_Value < 0.05 ~ "*",
+      TRUE ~ ""
+    )
+  )
+model.4$Estimate <- paste0(model.4$Estimate, model.4$stars)
 
 
 # Start the sink to capture output

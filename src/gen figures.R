@@ -85,7 +85,7 @@ combined_plot_data <- combined_plot_data %>%
   mutate(model_type = case_when(
     model_type == 'w1.GE_male_std' ~ 'Adolescent MGE',
     model_type == 'w4.GE_male_std' ~ 'Young Adult MGE',
-    model_type == 'delta_w1_w4_GE' ~ 'Change in MGE'
+    model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult Change in MGE'
   ),
   model_outcome = case_when(
     model_outcome == 'dx_htn5' ~ 'Hypertension Awareness',
@@ -100,42 +100,45 @@ combined_plot_data$model_outcome <- factor(
 
 combined_plot_data$model_type <- factor(
   combined_plot_data$model_type, 
-  levels = c('Adolescent MGE', 'Young Adult MGE', 'Change in MGE'))
+  levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Young Adult Change in MGE'))
 
 
 ggplot(combined_plot_data, aes(x=xvals)) +
   geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_type), alpha=0.5) +
   geom_line(aes(y=coef)) + 
   facet_grid(~model_type ~ model_outcome) +
-  scale_fill_nejm() +
+  scale_fill_manual(values = 
+                      c('Adolescent MGE' = '#DF8F44FF', 
+                        'Young Adult MGE' = '#00A1D5FF', 
+                        'Adolescent-to-Young Adult Change in MGE' = '#B24745FF')) +
   theme_bw(base_family = "Times New Roman") +
   geom_vline(xintercept =0, color='darkred') +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), breaks = c(0,0.25,0.5,0.75,1)) +
   labs(fill = "MGE Measure",
        y = "Predicted Probability\n", 
-       x='\nStandardized Gender Expressivity\n',
-       title = 'Associations of Male Gender Expressivity (MGE) with Predicted Probability of \nHypertension, Diabetes, or Hyperlipidemia Diagnoses Awareness in Men with Biomeasure Evidence of Disease\n',
+       x='\nStandardized Male Gender Expressivity\n',
+       title = 'Associations of Male Gender Expressivity (MGE) with Predicted Probability of \nHypertension, Diabetes, or Hyperlipidemia Diagnoses Awareness in Men with \nBiomeasure Evidence of Disease\n',
        caption = str_wrap('\n\nIncreased male gender expressivity in adolescence 
                           is significantly associated with decreased adult awareness 
                           of diabetes among men with elevated hemoglobin a1c levels > 6.5%. 
                           Increased male gender expression in young adulthood is significantly
                           associated with decreased adult awareness of hypertension among 
                           men with elevated blood pressure readings (> 130 mm Hg systolic 
-                          and/or > 80 mm Hg diastolic)', 140)) +
+                          and/or > 80 mm Hg diastolic)', 125)) +
   theme(strip.text.y = element_blank(),
         axis.text.x = element_text(color = "black", size = 18),
         axis.text.y = element_text(color = "black", size = 18),
         axis.title.x = element_text(color = 'black',size = 20),
         axis.title.y = element_text(color = 'black', size = 20),
-        plot.title = element_text(color = "black", size = 22, hjust = 0),
+        plot.title = element_text(color = "black", size = 20, hjust = 0, face = "bold"),
         plot.caption = element_text(color = "black", size = 15, hjust = 0),
-        legend.position = 'right',
-        legend.title = element_text(size=18),
+        legend.position = 'top',
+        legend.title = element_blank(),
         strip.text.x = element_text(color = 'black', size = 18, face = "bold"),
         legend.text = element_text(color = "black", size = 18)) 
 
 # save plot with white background
-ggsave('outputs/figures/figure.1.png', width = 16, height = 10, bg = "white")
+ggsave('outputs/figures/figure.1.png', width = 12, height = 11)
 
 ################################################################################
 
@@ -199,7 +202,7 @@ combined_plot_data <- combined_plot_data %>%
   mutate(model_type = case_when(
     model_type == 'w1.GE_male_std' ~ 'Adolescent MGE',
     model_type == 'w4.GE_male_std' ~ 'Young Adult MGE',
-    model_type == 'delta_w1_w4_GE' ~ 'Change in MGE'
+    model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult Change in MGE'
   ),
   model_outcome = case_when(
     model_outcome == 'w5_anti_htn' ~ 'Treatment of Hypertension',
@@ -214,40 +217,43 @@ combined_plot_data$model_outcome <- factor(
 
 combined_plot_data$model_type <- factor(
   combined_plot_data$model_type, 
-  levels = c('Adolescent MGE', 'Young Adult MGE', 'Change in MGE'))
+  levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Young Adult Change in MGE'))
 
 
 ggplot(combined_plot_data, aes(x=xvals)) +
   geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_type), alpha=0.5) +
   geom_line(aes(y=coef)) + 
   facet_grid(~model_type ~ model_outcome) +
-  scale_fill_nejm() +
+  scale_fill_manual(values = 
+                      c('Adolescent MGE' = '#DF8F44FF', 
+                        'Young Adult MGE' = '#00A1D5FF', 
+                        'Adolescent-to-Young Adult Change in MGE' = '#B24745FF')) +
   theme_bw(base_family = "Times New Roman") +
   geom_vline(xintercept =0, color='darkred') +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), breaks = c(0,0.25,0.5,0.75,1)) +
-  labs(fill = "MGE Measure",
+  labs(fill = "MGE Measure\n",
        y = "Predicted Probability\n", 
-       x='\nStandardized Gender Expressivity\n',
-       title = 'Associations of Male Gender Expressivity (MGE) with Predicted Probability of Adult Treatment of \nHypertension, Diabetes, or Hyperlipidemia in Men who Report Having These Conditions. \n',
-       caption = str_wrap('\n\nIncreased male gender expressivity in adolescence 
+       x='\nStandardized Male Gender Expressivity\n',
+       title = 'Associations of Male Gender Expressivity (MGE) with Predicted Probability of \nAdult Treatment of Hypertension, Diabetes, or Hyperlipidemia in Men who \nReport Having These Conditions. \n',
+       caption = str_wrap('\n\n\nIncreased male gender expressivity in adolescence 
                           is significantly associated with decreased adult 
                           treatment of hypertension among men who report 
                           awareness of hypertension diagnoses. Increased 
                           male gender expression in young adulthood is 
                           significantly associated with decreased adult 
                           treatment of hypertension and diabetes among men 
-                          who report awareness of hypertension and diabetes respectively)', 135)) +
+                          who report awareness of hypertension and diabetes respectively)', 125)) +
   theme(strip.text.y = element_blank(),
         axis.text.x = element_text(color = "black", size = 18),
         axis.text.y = element_text(color = "black", size = 18),
         axis.title.x = element_text(color = 'black',size = 20),
         axis.title.y = element_text(color = 'black', size = 20),
-        plot.title = element_text(color = "black", size = 22, hjust = 0),
+        plot.title = element_text(color = "black", size = 20, hjust = 0, face = "bold"),
         plot.caption = element_text(color = "black", size = 15, hjust = 0),
-        legend.position = 'right',
-        legend.title = element_text(size=18),
+        legend.position = 'top',
+        legend.title = element_blank(),
         strip.text.x = element_text(color = 'black', size = 18, face = "bold"),
         legend.text = element_text(color = "black", size = 18))
 
-ggsave('outputs/figures/figure.2.png', width = 16, height = 10)
+ggsave('outputs/figures/figure.2.png', width = 12, height = 11)
 
