@@ -1,37 +1,5 @@
+Log started:  Sat Aug 17 13:11:19 2024 
 
-> cat("Log started: ", date(), "\n\n")
-Log started:  Sun Mar 24 13:59:32 2024 
-
-
-> library(lmtest)
-
-> library(sandwich)
-
-> library(broom)
-
-> library(tidyverse)
-
-> library(sjstats)
-
-> library(stargazer)
-
-> library(marginaleffects)
-
-> library(gtsummary)
-
-> library(ggeffects)
-
-> library(ggsci)
-
-> library(haven)
-
-> library(labelled)
-
-> library(scales)
-
-> # Run all scripts -------------------------------------------------------------
-> ## Generate data
-> source("src/prepare data/Construct Analytical d ..." ... [TRUNCATED] 
 
 > ################################################################################
 > # AUTHOR:             Jacob Jameson
@@ -88,18 +56,15 @@ Log started:  Sun Mar 24 13:59:32 2024
 
 > final.df$weights.bio <- final.df$w5biowgt / mean(final.df$w5biowgt, na.rm = T)
 
-> ## Run models
-> source("src/gen tables.R", echo = TRUE)
-
 > ################################################################################
 > # AUTHOR:             Jacob Jameson
 > #
 > # DESCRIPTION:        T .... [TRUNCATED] 
 
-> # function to generate marginal effects coefficients (dy/dx) by group
+> # function to generate marginal effects coefficients (dy/dx) by group ----------
 > ape_analysis_by <- function(frml, df, weights, by){
 +   
-+   frml1 <- as.for .... [TRUNCATED] 
++   frml .... [TRUNCATED] 
 
 > ## Model 1 --------------------------------------------------------------------
 > 
@@ -277,7 +242,7 @@ Log started:  Sun Mar 24 13:59:32 2024
 +     grepl("w4.GE_male_std", term) ~ "Y ..." ... [TRUNCATED] 
 
 > ################################################################################
-> # in each model add stars to estimates depending on significance  .... [TRUNCATED] 
+> # In each model add stars to estimates depending on significance  .... [TRUNCATED] 
 
 > model.1$Estimate <- paste0(model.1$Estimate, model.1$stars)
 
@@ -308,11 +273,11 @@ Log started:  Sun Mar 24 13:59:32 2024
 
 > model.4$Estimate <- paste0(model.4$Estimate, model.4$stars)
 
+> ################################################################################
 > # Start the sink to capture output
-> sink("outputs/tables/Table 2.txt")
+> options(width = 200)
 
-> ## Generate figures
-> source("src/gen figures.R", echo = TRUE)
+> sink("outputs/tables/Robustness Check.txt")
 
 > ################################################################################
 > # AUTHOR:             Jacob Jameson
@@ -413,17 +378,6 @@ Log started:  Sun Mar 24 13:59:32 2024
 
 > ggsave('outputs/figures/figure.2.png', width = 12, height = 11)
 
-> # End logging -----------------------------------------------------------------
-> cat("\nAll scripts have been executed successfully. 
-+     Outputs ..." ... [TRUNCATED] 
-
 All scripts have been executed successfully. 
     Outputs are available in the outputs directory.
-
-> cat("Log ended: ", date(), "\n")
-Log ended:  Sun Mar 24 14:00:00 2024 
-
-> # Stop logging
-> sink(type = "message") # Stop diverting messages to log file
-
-> sink() # Stop diverting output to log file
+Log ended:  Sat Aug 17 13:12:12 2024 

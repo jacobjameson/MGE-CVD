@@ -68,7 +68,7 @@ combined_plot_data <- combined_plot_data %>%
   mutate(model_type = case_when(
     model_type == 'w1.GE_male_std' ~ 'Adolescent MGE',
     model_type == 'w4.GE_male_std' ~ 'Young Adult MGE',
-    model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult Change in MGE'
+    model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult \nChange in MGE'
   ),
   model_outcome = case_when(
     model_outcome == 'dx_htn5' ~ 'Hypertension Awareness',
@@ -83,17 +83,17 @@ combined_plot_data$model_outcome <- factor(
 
 combined_plot_data$model_type <- factor(
   combined_plot_data$model_type, 
-  levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Young Adult Change in MGE'))
+  levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Young Adult \nChange in MGE'))
 
 
 ggplot(combined_plot_data, aes(x=xvals)) +
-  geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_type), alpha=0.5) +
+  geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_outcome), alpha=0.65) +
   geom_line(aes(y=coef)) + 
-  facet_grid(~model_type ~ model_outcome) +
+  facet_grid(~model_outcome ~ model_type) +
   scale_fill_manual(values = 
-                      c('Adolescent MGE' = '#DF8F44FF', 
-                        'Young Adult MGE' = '#00A1D5FF', 
-                        'Adolescent-to-Young Adult Change in MGE' = '#B24745FF')) +
+                      c('Diabetes Awareness' = '#6C3E93', 
+                        'Hypertension Awareness' = '#C04848', 
+                        'Hyperlipidemia Awareness' = '#FFC857')) +
   theme_bw(base_family = "Times New Roman") +
   geom_vline(xintercept =0, color='darkred') +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), breaks = c(0,0.25,0.5,0.75,1)) +
@@ -108,20 +108,27 @@ ggplot(combined_plot_data, aes(x=xvals)) +
                           associated with decreased adult awareness of hypertension among 
                           men with elevated blood pressure readings (> 130 mm Hg systolic 
                           and/or > 80 mm Hg diastolic)', 125)) +
+  theme_economist() +
   theme(strip.text.y = element_blank(),
+      plot.background = element_rect(fill = 'white', color = NA),
+        panel.grid.major = element_line(color = 'grey85', size = 0.5),
         axis.text.x = element_text(color = "black", size = 18),
         axis.text.y = element_text(color = "black", size = 18),
         axis.title.x = element_text(color = 'black',size = 20),
+        panel.spacing = unit(1, "lines"),
+        axis.line.x = element_line(color = 'black', size = 0.5),
+        axis.line.y = element_line(color = 'black', size = 0.5),
         axis.title.y = element_text(color = 'black', size = 20),
         plot.title = element_text(color = "black", size = 20, hjust = 0, face = "bold"),
         plot.caption = element_text(color = "black", size = 15, hjust = 0),
         legend.position = 'top',
         legend.title = element_blank(),
-        strip.text.x = element_text(color = 'black', size = 18, face = "bold"),
+        strip.text.x = element_text(color = 'black', size = 18, face = "bold",
+                                    margin = margin(0.1,0,0.1,0, "cm")),
         legend.text = element_text(color = "black", size = 18)) 
 
 # save plot with white background
-ggsave('outputs/figures/figure.1.png', width = 12, height = 11)
+ggsave('outputs/figures/figure.1a.png', width = 13, height = 11)
 
 ################################################################################
 

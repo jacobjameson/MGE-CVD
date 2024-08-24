@@ -7,7 +7,7 @@
 ################################################################################
 
 # Data paths ------------------------------------------------------------
-data_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Core Files - Wave V'
+data_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Update 8.2021/Core Files - Wave V'
 survey_path <-  paste0(data_path, '/Wave V Mixed-Mode Survey Data')
 weights_path <-  paste0(data_path, '/Wave V Mixed-Mode Survey Weights')
 
@@ -16,7 +16,7 @@ wave.5 <- read_xpt(paste0(survey_path, '/wave5.xpt'))
 weights.5 <- read_xpt(paste0(weights_path, '/weights5.xpt'))
 
 # Merge wave 5 data with the weights
-wave.5 <- merge(wave.5, weights.5, by='AID')
+wave.5 <- merge(wave.5, weights.5, by='AID', all = T)
 
 # Remove data no longer using
 rm(weights.5)
@@ -39,12 +39,12 @@ glucose <- read_xpt(paste0(glucose_path, '/bglua1c5.xpt'))
 weights <- read_xpt(paste0(weights_path, '/bweight5.xpt'))
 
 # Merge Data
-wave.5 <- merge(wave.5, cardio, by='AID', all.x = T)
-wave.5 <- merge(wave.5, lipids, by='AID', all.x = T)
-wave.5 <- merge(wave.5, glucose, by='AID', all.x = T)
-wave.5 <- merge(wave.5, weights, by='AID', all.x = T)
+wave.5 <- merge(wave.5, cardio, by='AID', all = T)
+wave.5 <- merge(wave.5, lipids, by='AID', all = T)
+wave.5 <- merge(wave.5, glucose, by='AID', all = T)
+wave.5 <- merge(wave.5, weights, by='AID', all = T)
 
-# Rename variables lowercase
+
 names(wave.5) <- tolower(names(wave.5))
 
 # BMI Construction
@@ -79,7 +79,6 @@ wave.5 <- wave.5 %>%
       h5c_med2 == 0 ~ 0,
       h5c_med2 == 1 ~ 1))
 
-table(wave.5$h5aht)
 # Biomarker data
 wave.5 <- wave.5 %>%
   mutate(
@@ -91,7 +90,9 @@ wave.5 <- wave.5 %>%
       h5chba1c == 3 ~ 1),
     w5_bp = case_when(
       h5bpcls5 == 1 | h5bpcls5 == 2  ~ 0,
+    #  h5bpcls5 == 1 | h5bpcls5 == 2 | h5bpcls5 == 3  ~ 0,
       h5bpcls5 == 3 | h5bpcls5 == 4 | h5bpcls5 == 5 ~ 1),
+      #h5bpcls5 == 4 | h5bpcls5 == 5 ~ 1),
     w5_nhdl = case_when(
      h5nhdl >= 0 & h5nhdl < 190 ~ 0,
      h5nhdl >= 190 ~ 1 ))

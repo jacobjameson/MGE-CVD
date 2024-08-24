@@ -7,6 +7,8 @@
 # R version:           4.3.2 (2023-10-31)
 ################################################################################
 
+rm(list = ls()) # Clear workspace
+
 # Start logging ---------------------------------------------------------------
 log_file <- "outputs/run_all_log.txt"
 sink(log_file) # Start diverting R output to log file
@@ -26,6 +28,11 @@ library(ggsci)
 library(haven)
 library(labelled)
 library(scales)
+library(knitr)
+library(kableExtra)
+library(survey)
+library(margins)
+
 
 # Run all scripts -------------------------------------------------------------
 ## Generate data

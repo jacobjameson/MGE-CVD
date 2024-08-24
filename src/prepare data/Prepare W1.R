@@ -84,7 +84,17 @@ wave.1 <- wave.1 %>%
          h1ee2 = ifelse(h1ee2 > 5 | h1ee2 < 1, NA, h1ee2),
          h1fs4 = ifelse(h1fs4 > 3 | h1fs4 < 0, NA, h1fs4),
          h1gh42 = ifelse(h1gh42 > 4 | h1gh42 < 0, NA, h1gh42))
+  
+vars <- c("h1gh21", "h1da5", "h1fv5", "h1gh28", "h1pr4", "h1da10", "h1gh46",
+          "h1ee4", "h1ed7", "h1fs2", "h1gh39", "h1da11", "h1da1", "h1pf15",
+          "h1pr1", "h1gh20", "h1pf32", "h1id5", "h1da6", "h1pf16", "h1gh29",
+          "h1pf10", "h1ee2", "h1fs4", "h1gh42")
 
+# group_by bio_sex and impute missing values with median ---------------------
+#wave.1 <- wave.1 %>%
+#  group_by(bio_sex) %>%
+#  mutate_at(vars, funs(replace(., is.na(.), median(., na.rm = TRUE))) ) %>%
+#  ungroup()
 
 # Logistic regression to predict male using GE variables ------------------------
 wave.1$w1_male <- factor(ifelse(wave.1$bio_sex == 1, 1, 0))
