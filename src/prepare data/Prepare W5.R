@@ -153,4 +153,5 @@ wave.5 <- wave.5 %>%
 
 
 wave.5$w5_male <- factor(ifelse(wave.5$h5od2b == 1, 1, 0))
+wave.5$w5_malesex <- factor(ifelse(wave.5$h5od2a == 1, 1, 0))
 ################################################################################

@@ -94,6 +94,8 @@ table_output <- kable(summary_table,
   kable_styling(font_size = 12, full_width = F) %>%
   add_header_above(c(" " = 1, "Missing Data Summary" = 2))  
 
+table_output
+
 # Save the table as a PDF file
 save_kable(table_output, file = "outputs/tables/Missing_Data_Summary.pdf")
 
@@ -195,10 +197,10 @@ ahdsgn %>%
 
 controls <- 'race5 + sespc_al + nhood1_d + ins5 + edu5'
 
-final.df <- final.df %>%
-  group_by(in_sample) %>%
-  mutate_at(c('race5', 'sespc_al', 'nhood1_d', 'ins5', 'edu5'), funs(replace(., is.na(.), median(., na.rm = TRUE))) ) %>%
-  ungroup()
+#final.df <- final.df %>%
+#  group_by(in_sample) %>%
+#  mutate_at(c('race5', 'sespc_al', 'nhood1_d', 'ins5', 'edu5'), funs(replace(., is.na(.), median(., na.rm = TRUE))) ) %>%
+#  ungroup()
 
 final.df$complete_case <- ifelse(
   rowSums(
