@@ -95,28 +95,3 @@ final.df$weights <- final.df$gsw5 / mean(final.df$gsw5, na.rm = T)
 final.df$weights.bio <- final.df$w5biowgt / mean(final.df$w5biowgt, na.rm = T)
 
 ################################################################################
-
-vars <- c('h1gh21', 'h1da5', 'h1fv5', 'h1gh28', 'h1pr4', 'h1da10', 'h1gh46', 
-          'h1ee4', 'h1ed7', 'h1fs2', 'h1gh39', 'h1da11', 'h1da1', 'h1pf15', 
-          'h1pr1', 'h1gh20', 'h1pf32', 'h1id5', 'h1da6', 'h1pf16', 'h1gh29', 
-          'h1pf10', 'h1ee2', 'h1fs4', 'h1gh42',
-          'h4to25', 'h4cj1', 'h4da16', 'h4pe5', 'h4pe9', 'h4pe2', 'h4da6', 
-'h4da23', 'h4da8', 'h4pe4', 'h4re10', 'h4da17', 'h4mi1', 'h4da4', 
-'h4mh23', 'h4pe6', 'h4mh7', 'h4pe10', 'h4pe35', 'h4da11', 'h4pe22', 
-'h4pe26', 'sespc_al', 'nhood1_d', 'race5', 'ins5',
-'edu5')
-
-# Creating a detailed summary table
-summary_table <- final.df %>%
-  filter(in_sample0 == 1) %>%
-  summarise(
-    Total_N_W1_males = n(),  #
-    across(all_of(vars), ~sum(is.na(.)) / Total_N_W1_males * 100, .names = "perc_missing_{.col}"),  # Percentage missing for each variable
-    Perc_Missing_Any = round(sum(rowSums(is.na(select(., all_of(vars)))) > 0) / Total_N_W1_males * 100, 2)) %>%
-  pivot_longer(cols = -Total_N_W1_males, 
-               names_to = "Variable", 
-               values_to = "Percentage_Missing") 
-
-summary_table$Percentage_Missing <- paste(round(summary_table$Percentage_Missing, 2), '%')
-
-#write.csv(summary_table, "outputs/tables/Missing for W1 W4 MGE Vars.csv", row.names = F)

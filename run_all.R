@@ -32,10 +32,14 @@ library(knitr)
 library(kableExtra)
 library(survey)
 library(margins)
+library(gtsummary)
 
 
 # Run all scripts -------------------------------------------------------------
 ## Generate data
+options(warn = -1) # Suppress warnings
+options(max.print = 10000) # Increase max print
+
 source("src/prepare data/Construct Analytical dataset.R", echo = TRUE)
 
 ## Run models
