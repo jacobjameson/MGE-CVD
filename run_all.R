@@ -4,7 +4,7 @@
 # DESCRIPTION:        This script loads all necessary packages for the project 
 #                     and runs all other scripts necessary for the project.
 #
-# R version:           4.3.2 (2023-10-31)
+# R version:           4.3.3 (2024-8-28)
 ################################################################################
 
 rm(list = ls()) # Clear workspace
@@ -33,20 +33,21 @@ library(kableExtra)
 library(survey)
 library(margins)
 library(gtsummary)
+library(ggthemes)
 
 
 # Run all scripts -------------------------------------------------------------
 ## Generate data
 options(warn = -1) # Suppress warnings
-options(max.print = 10000) # Increase max print
 
-source("src/prepare data/Construct Analytical dataset.R", echo = TRUE)
+source("src/prepare data/Construct Analytical dataset.R",
+       echo = TRUE, max.deparse.length = 1000)
 
 ## Run models
-source("src/gen tables.R", echo = TRUE)
+source("src/gen tables.R", echo = TRUE, max.deparse.length = 1000)
 
 ## Generate figures
-source("src/gen figures.R", echo = TRUE)
+source("src/gen figures.R", echo = TRUE,max.deparse.length = 1000)
 
 # End logging -----------------------------------------------------------------
 cat("\nAll scripts have been executed successfully. 

@@ -82,8 +82,8 @@ final.df <- final.df[, vars.keep]
 
 # Create a binary variable indicating whether a respondent is in the sample
 final.df <- final.df %>%
-  mutate(in_sample0 = ifelse(w1_male == w4_male & w1_male == w5_male & w1_male == 1, 1, 0),
-         in_sample = ifelse(w1_male == w4_male & w1_male == w5_male & w1_male == 1, 1, 0),
+  mutate(in_sample0 = ifelse(w1_male == 1 & w4_male == 1 & w5_male == 1, 1, 0),
+         in_sample = ifelse(w1_male == 1 & w4_male == 1 & w5_male == 1, 1, 0),
          in_sample = ifelse(is.na(w1.GE_male) == F & is.na(w4.GE_male) == F, in_sample, 0),
          in_sample.5  = ifelse(in_sample == 1 & is.na(gsw5) == F, 1, 0),
          in_sample.bio = ifelse(in_sample == 1 & is.na(w5biowgt) == F, 1, 0))
@@ -93,5 +93,23 @@ final.df <- final.df %>%
 final.df$cluster <- paste(final.df$region,final.df$psuscid)
 final.df$weights <- final.df$gsw5 / mean(final.df$gsw5, na.rm = T)
 final.df$weights.bio <- final.df$w5biowgt / mean(final.df$w5biowgt, na.rm = T)
+
+final.df$tx_dx_bp <- ifelse(
+  final.df$dx_htn5 == 1 & final.df$w5_anti_htn == 1, 1, 0)
+
+final.df$tx_dx_hld <- ifelse(
+  final.df$dx_hld5 == 1 & final.df$w5_anti_hld_med_use == 1, 1, 0)
+
+final.df$tx_dx_dm <- ifelse(
+  final.df$dx_dm5 == 1 & final.df$w5_anti_dm_med_use == 1, 1, 0)
+
+final.df$dx_bio_bp <- ifelse(
+  final.df$dx_htn5 == 1 & final.df$w5_bp == 1, 1, 0)
+
+final.df$dx_bio_hld <- ifelse(
+  final.df$dx_hld5 == 1 & final.df$w5_nhdl == 1, 1, 0)
+
+final.df$dx_bio_dm <- ifelse(
+  final.df$dx_dm5 == 1 & final.df$w5_a1c == 1, 1, 0)
 
 ################################################################################

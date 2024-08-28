@@ -1,10 +1,18 @@
-Log started:  Sat Aug 17 13:11:19 2024 
+Log started:  Wed Aug 28 16:54:15 2024 
 
 
 > ################################################################################
 > # AUTHOR:             Jacob Jameson
 > #
-> # DESCRIPTION:        T .... [TRUNCATED] 
+> # DESCRIPTION:        This script constructs the analytical dataset that will be 
+> #                     used for the analysis. The script merges the wave 1, 
+> #                     wave 4, wave 5, and SES data together.
+> #
+> # DEPENDENCIES:       Prepare W1.R, Prepare W4.R, Prepare W5.R
+> ################################################################################
+> 
+> # Create and prepare wave 1 and wave 4 data
+> source('src/prepare data/Prepare W1.R')
 
 > source('src/prepare data/Prepare W4.R')
 
@@ -22,32 +30,67 @@ Log started:  Sat Aug 17 13:11:19 2024
 
 > final.df <- merge(final.df, wave.5, by=c('aid', 'psuscid', 'region'), all=TRUE)
 
-> final.df <- merge(final.df, ses.data, by='aid')
+> final.df <- merge(final.df, ses.data, by='aid', all=TRUE)
 
 > # Clear environment
 > rm(list=setdiff(ls(), 'final.df'))
 
 > ################################################################################
 > # CREATE VARIABLES THAT WILL BE USED IN ANALYSIS:
-> ############# .... [TRUNCATED] 
+> ################################################################################
+> # GE Change Variables
+> 
+> final.df <- final.df %>%
++   mutate(
++     delta_w1_w4_GE = w4.GE_male_std - w1.GE_male_std,
++     increasing = ifelse(delta_w1_w4_GE > 0, 1, 0),
++     self_self = case_when(
++       w1.GE_male_std >= 0 & delta_w1_w4_GE > 0 ~ 1,
++       w1.GE_male_std >= 0 & delta_w1_w4_GE < 0 ~ 2,
++       w1.GE_male_std < 0 & delta_w1_w4_GE > 0 ~ 3,
++       w1.GE_male_std < 0 & delta_w1_w4_GE < 0 ~ 4
++     )
++   )
 
-> final.df$self_self <- factor(
-+   final.df$self_self,
-+   levels = c(1, 2, 3, 4),
-+   labels = c(
-+     "Above Adolescent Male Avg and Increasing",
- .... [TRUNCATED] 
+> ################################################################################
+> # determine ages of respondents at each wave
+> 
+> # wave 1 ---------------------
+> final.df$w1_age <- final.df$iyear - final.df$h1gi1y + (final.df$imonth - final.df$h1gi1m) / 12
+
+> # wave 4 ---------------------
+> final.df$w4_age <- final.df$iyear4 - (1900 + final.df$h1gi1y) + (final.df$imonth4 - final.df$h1gi1m) / 12
+
+> # wave 5 ---------------------
+> final.df$w5_age <- final.df$iyear5 - (1900 + final.df$h1gi1y) + (final.df$imonth5 - final.df$h1gi1m) / 12
 
 > ################################################################################
 > # Determine what variables to keep for analysis
 > 
-> vars.keep <- .... [TRUNCATED] 
+> vars.keep <- c('dx_cad5', 'dx_htn5', 'dx_dm5', 'dx_hld5', 
++                'w5_male', 'dx_bmi52', 'sr_bmi', 'gsw5',
++                'w5_anti_hld_med_use', 'w5_anti_dm_med_use','w5_anti_htn', 
++                'aid', 'region', 'psuscid', 'gswgt4_2', 'sschlcde', 
++                'w1_male', 'self_self', 'delta_w1_w4_GE', 
++                'w1.GE_male','w4.GE_male', 
++                'w1.GE_male_std', 'w4.GE_male_std',
++                'sespc_al', 'nhood1_d', 'race', 
++                'w4_male', 'w5_nhdl',
++                'lipid5cat', 'w5_a1c', 'w5_bp', 'race5_d', 'race5', 'ins5',
++                'edu5', 'w5biowgt', 'w1_age', 'w4_age', 'w5_age',
++                'h1gh21', 'h1da5', 'h1fv5', 'h1gh28', 'h1pr4', 'h1da10', 'h1gh46', 
++                'h1ee4', 'h1ed7', 'h1fs2', 'h1gh39', 'h1da11', 'h1da1', 'h1pf15', 
++                'h1pr1', 'h1gh20', 'h .... [TRUNCATED] 
 
 > final.df <- final.df[, vars.keep]
 
 > # Create a binary variable indicating whether a respondent is in the sample
 > final.df <- final.df %>%
-+   mutate(in_sample = ifelse(w1_male == w4_m .... [TRUNCATED] 
++   mutate(in_sample0 = ifelse(w1_male == 1 & w4_male == 1 & w5_male == 1, 1, 0),
++          in_sample = ifelse(w1_male == 1 & w4_male == 1 & w5_male == 1, 1, 0),
++          in_sample = ifelse(is.na(w1.GE_male) == F & is.na(w4.GE_male) == F, in_sample, 0),
++          in_sample.5  = ifelse(in_sample == 1 & is.na(gsw5) == F, 1, 0),
++          in_sample.bio = ifelse(in_sample == 1 & is.na(w5biowgt) == F, 1, 0))
 
 > #create cluster var
 > final.df$cluster <- paste(final.df$region,final.df$psuscid)
@@ -56,328 +99,1125 @@ Log started:  Sat Aug 17 13:11:19 2024
 
 > final.df$weights.bio <- final.df$w5biowgt / mean(final.df$w5biowgt, na.rm = T)
 
+> final.df$tx_dx_bp <- ifelse(
++   final.df$dx_htn5 == 1 & final.df$w5_anti_htn == 1, 1, 0)
+
+> final.df$tx_dx_hld <- ifelse(
++   final.df$dx_hld5 == 1 & final.df$w5_anti_hld_med_use == 1, 1, 0)
+
+> final.df$tx_dx_dm <- ifelse(
++   final.df$dx_dm5 == 1 & final.df$w5_anti_dm_med_use == 1, 1, 0)
+
+> final.df$dx_bio_bp <- ifelse(
++   final.df$dx_htn5 == 1 & final.df$w5_bp == 1, 1, 0)
+
+> final.df$dx_bio_hld <- ifelse(
++   final.df$dx_hld5 == 1 & final.df$w5_nhdl == 1, 1, 0)
+
+> final.df$dx_bio_dm <- ifelse(
++   final.df$dx_dm5 == 1 & final.df$w5_a1c == 1, 1, 0)
+
+> ################################################################################
+
 > ################################################################################
 > # AUTHOR:             Jacob Jameson
 > #
-> # DESCRIPTION:        T .... [TRUNCATED] 
+> # DESCRIPTION:        This script generates the tables for the paper.
+> # 
+> # DEPENDENCIES:       The script requires the following dataset:
+> #                     -final.df, which is the final dataset constructed by 
+> #                      executing scr/prepare data/Construct Analytical dataset.R
+> ################################################################################
+> 
+> #-------------------------------------------------------------------------------
+> ################################################################################
+> # Table 1. Demographic Characteristics of Males Included in 
+> # Analytic Sample (N = 4,230)
+> ################################################################################
+> #-------------------------------------------------------------------------------
+> 
+> final.df$group <- ifelse(final.df$w4.GE_male_std >=0 .... [TRUNCATED] 
 
-> # function to generate marginal effects coefficients (dy/dx) by group ----------
-> ape_analysis_by <- function(frml, df, weights, by){
+> vars <- c('race', 'edu5', 'ins5', 'sespc_al', 'nhood1_d', 
++           'dx_htn5', 'w5_bp', 'w5_anti_htn', 'tx_dx_bp', 'dx_bio_bp',
++           'dx_dm5', 'w5_a1c', 'w5_anti_dm_med_use', 'tx_dx_dm', 'dx_bio_dm',
++           'dx_hld5', 'w5_nhdl', 'w5_anti_hld_med_use', 'tx_dx_hld', 'dx_bio_hld')
+
+> final.df %>%
++   filter(in_sample == 1) %>%
++   tbl_summary(
++     by = group, 
++     type = all_continuous() ~ "continuous2",
++     statistic = 
++       all_continuous() ~ c("{median} ({min}, {max})"),
++     missing = "no",
++     include = c(vars, group)) %>%
++   add_n() %>%
++   add_p(pvalue_fun = ~style_pvalue(.x, digits = 2),
++         test = list(all_continuous() ~ "t.test",
++                     all_categorical() ~ "chisq.test")) %>%
++   add_overall() %>%
++   modify_header(label ~ "**Variable**") %>%
++   modify_caption("**Table 1. Patient Characteristics (unweighted)**") %>%
++   bold_labels() %>%
++   as_gt() %>%
++   gt::gtsave(filename = "outputs/tables/Table 1 unweighted.png")
+
+> ################################################################################
+> ################################################################################
+> #-------------------------------------------------------------------------------
+> ################################################################################
+> # Table 2. Marginal effects coefficients (dy/dx) estimating associations 
+> # between adolescent, young adult, and adolescent-to-young-adult change 
+> # in male gender expression (MGE) and adult awareness of hypertension, 
+> # diabetes, and hyperlipidemia 
+> ################################################################################
+> #-------------------------------------------------------------------------------
+> 
+> 
+> controls <- 'race5 + sespc_al + nhood1_d + ins5 + edu5'
+
+> final.df$complete_case <- ifelse(
++   rowSums(
++     is.na(
++       final.df[, c('race5', 'sespc_al', 'nhood1_d', 'ins5', 'edu5')]
++     )
++   ) == 0, 1, 0)
+
+> ame_analysis <- function(frml, design, var, outcome){
 +   
-+   frml .... [TRUNCATED] 
++   frml1 <- as.formula(frml)
++   model <- svyglm(formula = frml1, design = design, 
++                   family = "quasibinomial")
++   
++   ame <-
++     summary(
++       margins(model, method = "dydx", variables = c(var), design = design)
++     ) %>%
++     as.data.frame() %>% 
++     mutate(
++       outcome = outcome,
++       AME = sprintf("%.3f", AME),
++       SE = sprintf("%.3f", SE),
++       CI = sprintf("(%.3f, %.3f)", lower, upper),
++       P_value = ifelse(p < 0.001, "<0.001", sprintf("%.3f", p))
++     ) %>%
++     select(Outcome = outcome, Term = factor, AME, `AME SE` = SE, 
++            `AME P_value`= P_value, `AME 95% CI` = CI)
++   
++   return(ame)
++ }
 
+> ################################################################################
 > ## Model 1 --------------------------------------------------------------------
+> ### (DX ~ MGE  + controls)
+> ################################################################################
 > 
-> # Define the subset and weights
-> subset_df <- subset(final.df, .... [TRUNCATED] 
+> ahdsgn <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~gsw5,
++   data=subset(final.df, is.na(gsw5) == F & is.na(region) == F),
++   nest=TRUE)
 
-> subset_weights <- subset_df$weights
-
-> ### Formulas
+> # hypertension -----------------------------------------------------------------
 > 
-> formulas_htn <- c(
-+   'dx_htn5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'dx_htn5 ~ w4.GE_male_std + rac .... [TRUNCATED] 
+> htn.1a <- ame_analysis(paste('dx_htn5 ~ w1.GE_male_std +', controls),
++                        subset(ahdsgn, in_sample.5 == 1 & complete_case == 1), 
++                        'w1.GE_male_std', 'dx_htn5')
 
-> formulas_dm <- c(
-+   'dx_dm5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'dx_dm5 ~ w4.GE_male_std + race5 + sespc_al + nhood .... [TRUNCATED] 
+> htn.1b <- ame_analysis(paste('dx_htn5 ~ w4.GE_male_std +', controls),
++                        subset(ahdsgn, in_sample.5 == 1 & complete_case == 1),
++                        'w4.GE_male_std', 'dx_htn5')
 
-> formulas_hld <- c(
-+   'dx_hld5 ~ w1.GE_male_std + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'dx_hld5 ~ w4.GE_male_std + race5 + sespc_al + nh .... [TRUNCATED] 
+> htn.1c <- ame_analysis(paste('dx_htn5 ~ delta_w1_w4_GE + w1.GE_male_std +', controls),
++                        subset(ahdsgn, in_sample.5 == 1 & complete_case == 1),
++                        'delta_w1_w4_GE', 'dx_htn5')
 
-> # Perform analysis 
-> results_htn <- map_dfr(
-+   formulas_htn, ~ ape_analysis(.x, subset_df, subset_weights)
-+   ) %>%
-+   mutate(outcome = 'Dx Hyp .... [TRUNCATED] 
+> htn.1 <- rbind(htn.1a, htn.1b, htn.1c)
 
-> results_dm <- map_dfr(
-+   formulas_dm, ~ ape_analysis(.x, subset_df, subset_weights)
-+ ) %>%
-+   mutate(outcome = 'Dx Diabetes')
+> # diabetes ---------------------------------------------------------------------
+> dm.1a <- ame_analysis(paste('dx_dm5 ~ w1.GE_male_std + ', controls),
++                       subset(ahdsgn, in_sample.5 == 1 & complete_case == 1), 
++                       'w1.GE_male_std', 'dx_dm5')
 
-> results_hld <- map_dfr(
-+   formulas_hld, ~ ape_analysis(.x, subset_df, subset_weights)
-+ ) %>%
-+   mutate(outcome = 'Dx Hyperlipidemia')
+> dm.1b <- ame_analysis(paste('dx_dm5 ~ w4.GE_male_std + ', controls),
++                       subset(ahdsgn, in_sample.5 == 1 & complete_case == 1), 
++                       'w4.GE_male_std', 'dx_dm5')
 
-> # append data frames
-> results <- bind_rows(results_hld, results_htn, results_dm)
+> dm.1c <- ame_analysis(paste('dx_dm5 ~ delta_w1_w4_GE + w1.GE_male_std + ', controls),
++                       subset(ahdsgn, in_sample.5 == 1 & complete_case == 1), 
++                       'delta_w1_w4_GE', 'dx_dm5')
 
-> model.1 <- results %>%
-+   mutate(term = case_when(
-+     grepl("w1.GE_male_std", term) ~ "Adolescent MGE",
-+     grepl("w4.GE_male_std", term) ~ "Y ..." ... [TRUNCATED] 
+> dm.1 <- rbind(dm.1a, dm.1b, dm.1c)
 
+> # hyperlipidemia ---------------------------------------------------------------
+> hld.1a <- ame_analysis(paste('dx_hld5 ~ w1.GE_male_std + ', controls),
++                       subset(ahdsgn, in_sample.5 == 1 & complete_case == 1), 
++                       'w1.GE_male_std', 'dx_hld5')
+
+> hld.1b <- ame_analysis(paste('dx_hld5 ~ w4.GE_male_std + ', controls),
++                        subset(ahdsgn, in_sample.5 == 1 & complete_case == 1),
++                       'w4.GE_male_std', 'dx_hld5')
+
+> hld.1c <- ame_analysis(paste('dx_hld5 ~ delta_w1_w4_GE + w1.GE_male_std + ', controls),
++                        subset(ahdsgn, in_sample.5 == 1 & complete_case == 1), 
++                        'delta_w1_w4_GE', 'dx_hld5')
+
+> hld.1 <- rbind(hld.1a, hld.1b, hld.1c)
+
+> model.1 <- rbind(htn.1, dm.1, hld.1) %>%
++   mutate(stars = case_when(
++     `AME P_value` < 0.01 ~ "***",
++     `AME P_value` < 0.05 ~ "**",
++     `AME P_value` < 0.1 ~ "*",
++     TRUE ~ ""),
++     values = paste(paste0(AME,stars), `AME 95% CI`, 'P Value =', `AME P_value`)) %>%
++   select(Outcome, Term, values) %>%
++   pivot_wider(names_from = Term, values_from = values) %>%
++   mutate(Outcome = case_when(
++     Outcome == "dx_htn5" ~ "Dx of hypertension",
++     Outcome == "dx_dm5"  ~ "Dx of diabetes",
++     Outcome == "dx_hld5" ~ "Dx of hyperlipidemia"
++   ),
++   Model = 'Model 1') %>%
++   rename(`Adolescent MGE` = w1.GE_male_std, 
++          `Young adult MGE` = w4.GE_male_std,
++          `Change in MGE` = delta_w1_w4_GE) 
+
+> ################################################################################
 > ## Model 2 --------------------------------------------------------------------
+> ### (DX ~ MGE##Bio-M + controls
+> ################################################################################
 > 
-> # Define the subset and weights
-> subset_df <- subset(final.df, .... [TRUNCATED] 
+> ahdsgnbio <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~weights.bio,
++   data=subset(final.df, in_sample.bio == 1 & is.na(psuscid) == F & is.na(region) == F),
++   nest=TRUE)
 
-> subset_weights <- subset_df$weights
+> ame_by_bio_analysis <- function(frml, design, var, outcome, bio_var){
++   
++   frml1 <- as.formula(frml)
++   model <- svyglm(formula = frml1, design = design, 
++                   family = "quasibinomial")
++   
++   if (bio_var == 'w5_bp'){
++     ame <-
++       summary(
++         margins(model, method = "dydx", design = design,
++                 variables = c(var), 
++                 at = list(w5_bp = c(1)))
++       )
++   }
++   
++   if (bio_var == 'w5_a1c'){
++     ame <-
++       summary(
++         margins(model, method = "dydx", design = design,
++                 variables = c(var), 
++                 at = list(w5_a1c = c(1)))
++       )
++   }
++   
++   if (bio_var == 'w5_nhdl'){
++     ame <-
++       summary(
++         margins(model, method = "dydx", design = design,
++                 variables = c(var), 
++                 at = list(w5_nhdl = c(1)))
++       )
++   }
++ 
++   ame <- ame %>%
++     as.data.frame() %>% 
++     mutate(
++       outcome = outcome,
++       AME = sprintf("%.3f", AME .... [TRUNCATED] 
 
-> formulas_htn <- c(
-+   'dx_htn5 ~ w1.GE_male_std + w5_bp + w1.GE_male_std*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'dx_htn5 ~ w4.GE_m .... [TRUNCATED] 
+> # hypertension -----------------------------------------------------------------
+> htn.2a <- ame_by_bio_analysis(paste('dx_htn5 ~ w1.GE_male_std*w5_bp +', controls),
++                               subset(ahdsgnbio, complete_case == 1), 
++                               'w1.GE_male_std', 'dx_htn5', 'w5_bp')
 
-> formulas_dm <- c(
-+   'dx_dm5 ~ w1.GE_male_std + w5_a1c + w1.GE_male_std*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'dx_dm5 ~ w4.GE_ma .... [TRUNCATED] 
+> htn.2b <- ame_by_bio_analysis(paste('dx_htn5 ~ w4.GE_male_std*w5_bp +', controls),
++                               subset(ahdsgnbio, complete_case == 1), 
++                               'w4.GE_male_std', 'dx_htn5', 'w5_bp')
 
-> formulas_hld <- c(
-+   'dx_hld5 ~ w1.GE_male_std + w5_nhdl + w1.GE_male_std*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'dx_hld5 ~ w4. .... [TRUNCATED] 
+> htn.2c <- ame_by_bio_analysis(paste('dx_htn5 ~ delta_w1_w4_GE*w5_bp + w1.GE_male_std +', controls),
++                               subset(ahdsgnbio, complete_case == 1), 
++                               'delta_w1_w4_GE', 'dx_htn5', 'w5_bp')
 
-> # Perform analysis 
-> results_htn <- map_dfr(
-+   formulas_htn, ~ ape_analysis_by(.x, subset_df, subset_weights, 'w5_bp')
-+ ) %>%
-+   mutate(outcome .... [TRUNCATED] 
+> htn.2 <- rbind(htn.2a, htn.2b, htn.2c)
 
-> results_dm <- map_dfr(
-+   formulas_dm, ~ ape_analysis_by(.x, subset_df, subset_weights, 'w5_a1c')
-+ ) %>%
-+   mutate(outcome = 'Dx Diabetes') %>%
-+ .... [TRUNCATED] 
+> # diabetes ---------------------------------------------------------------------
+> dm.2a <- ame_by_bio_analysis(paste('dx_dm5 ~ w1.GE_male_std*w5_a1c +', controls),
++                           subset(ahdsgnbio, complete_case == 1), 
++                           'w1.GE_male_std', 'dx_dm5', 'w5_a1c')
 
-> results_hld <- map_dfr(
-+   formulas_hld, ~ ape_analysis_by(.x, subset_df, subset_weights, 'w5_nhdl')
-+ ) %>%
-+   mutate(outcome = 'Dx Hyperlipidemi .... [TRUNCATED] 
+> dm.2b <- ame_by_bio_analysis(paste('dx_dm5 ~ w4.GE_male_std*w5_a1c +', controls),
++                           subset(ahdsgnbio, complete_case == 1), 
++                           'w4.GE_male_std', 'dx_dm5', 'w5_a1c')
 
-> # append data frames
-> results <- bind_rows(results_hld, results_htn, results_dm)
+> dm.2c <- ame_by_bio_analysis(paste('dx_dm5 ~ delta_w1_w4_GE*w5_a1c + w1.GE_male_std +', controls),
++                              subset(ahdsgnbio, complete_case == 1), 
++                              'delta_w1_w4_GE', 'dx_dm5', 'w5_a1c')
 
-> model.2 <- results %>%
-+   mutate(term = case_when(
-+     grepl("w1.GE_male_std", term) ~ "Adolescent MGE",
-+     grepl("w4.GE_male_std", term) ~ "Y ..." ... [TRUNCATED] 
+> dm.2 <- rbind(dm.2a, dm.2b, dm.2c)
 
-> ## Model 3 --------------------------------------------------------------------
-> 
-> # Define the subset and weights
-> subset_df <- subset(final.df, .... [TRUNCATED] 
+> # hyperlipidemia --------------------------------------------------------------
+> hld.2a <- ame_by_bio_analysis(paste('dx_hld5 ~ w1.GE_male_std*w5_nhdl +', controls),
++                               subset(ahdsgnbio, complete_case == 1),
++                               'w1.GE_male_std', 'dx_hld5', 'w5_nhdl')
 
-> subset_weights <- subset_df$weights
+> hld.2b <- ame_by_bio_analysis(paste('dx_hld5 ~ w4.GE_male_std*w5_nhdl +', controls),
++                               subset(ahdsgnbio, complete_case == 1),
++                               'w4.GE_male_std', 'dx_hld5', 'w5_nhdl')
 
-> formulas_htn <- c(
-+   'w5_anti_htn ~ w1.GE_male_std + w1.GE_male_std*dx_htn5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'w5_anti_htn ~ w4.GE .... [TRUNCATED] 
+> hld.2c <- ame_by_bio_analysis(paste('dx_hld5 ~ delta_w1_w4_GE*w5_nhdl + w1.GE_male_std +', controls),
++                               subset(ahdsgnbio, complete_case == 1),
++                               'delta_w1_w4_GE', 'dx_hld5', 'w5_nhdl')
 
-> formulas_dm <- c(
-+   'w5_anti_dm_med_use ~ w1.GE_male_std + w1.GE_male_std*dx_dm5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'w5_anti_dm_med .... [TRUNCATED] 
+> hld.2 <- rbind(hld.2a, hld.2b, hld.2c)
 
-> formulas_hld <- c(
-+   'w5_anti_hld_med_use ~ w1.GE_male_std + w1.GE_male_std*dx_hld5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'w5_anti_hld .... [TRUNCATED] 
-
-> # Perform analysis 
-> results_htn <- map_dfr(
-+   formulas_htn, ~ ape_analysis_by(.x, subset_df, subset_weights, 'dx_htn5')
-+ ) %>%
-+   mutate(outco .... [TRUNCATED] 
-
-> results_dm <- map_dfr(
-+   formulas_dm, ~ ape_analysis_by(.x, subset_df, subset_weights, 'dx_dm5')
-+ ) %>%
-+   mutate(outcome = 'Anti Diabetes Med') .... [TRUNCATED] 
-
-> results_hld <- map_dfr(
-+   formulas_hld, ~ ape_analysis_by(.x, subset_df, subset_weights, 'dx_hld5')
-+ ) %>%
-+   mutate(outcome = 'Anti Hyperlipide .... [TRUNCATED] 
-
-> # append data frames
-> results <- bind_rows(results_hld, results_htn, results_dm)
-
-> model.3 <- results %>%
-+   mutate(term = case_when(
-+     grepl("w1.GE_male_std", term) ~ "Adolescent MGE",
-+     grepl("w4.GE_male_std", term) ~ "Y ..." ... [TRUNCATED] 
-
-> ## Model 4 --------------------------------------------------------------------
-> 
-> # Define the subset and weights
-> subset_df <- subset(final.df, .... [TRUNCATED] 
-
-> subset_weights <- subset_df$weights
-
-> formulas_htn <- c(
-+   'w5_bp ~ w1.GE_male_std + w5_anti_htn + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'w5_bp ~ w4.GE_male_std + w5_anti_htn .... [TRUNCATED] 
-
-> formulas_dm <- c(
-+   'w5_a1c ~ w1.GE_male_std + w5_anti_dm_med_use + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'w5_a1c ~ w4.GE_male_std + w5_ .... [TRUNCATED] 
-
-> formulas_hld <- c(
-+   'w5_nhdl ~ w1.GE_male_std + w5_anti_hld_med_use + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'w5_nhdl ~ w4.GE_male_std + .... [TRUNCATED] 
-
-> # Perform analysis 
-> results_htn <- map_dfr(
-+   formulas_htn, ~ ape_analysis(.x, subset_df, subset_weights)
-+ ) %>%
-+   mutate(outcome = 'Biomarke .... [TRUNCATED] 
-
-> results_dm <- map_dfr(
-+   formulas_dm, ~ ape_analysis(.x, subset_df, subset_weights)
-+ ) %>%
-+   mutate(outcome = 'Biomarker Diabetes')
-
-> results_hld <- map_dfr(
-+   formulas_hld, ~ ape_analysis(.x, subset_df, subset_weights)
-+ ) %>%
-+   mutate(outcome = 'Biomarker Hyperlipidemia')
-
-> # append data frames
-> results <- bind_rows(results_hld, results_htn, results_dm)
-
-> model.4 <- results %>%
-+   mutate(term = case_when(
-+     grepl("w1.GE_male_std", term) ~ "Adolescent MGE",
-+     grepl("w4.GE_male_std", term) ~ "Y ..." ... [TRUNCATED] 
+> model.2 <- rbind(htn.2, dm.2, hld.2) %>%
++   mutate(stars = case_when(
++     `AME P_value` < 0.01 ~ "***",
++     `AME P_value` < 0.05 ~ "**",
++     `AME P_value` < 0.1 ~ "*",
++     TRUE ~ ""),
++     values = paste(paste0(AME,stars), `AME 95% CI`, 'P Value =', `AME P_value`)) %>%
++   select(Outcome, Term, values) %>%
++   pivot_wider(names_from = Term, values_from = values) %>%
++   mutate(Outcome = case_when(
++     Outcome == "dx_htn5" ~ "Dx of hypertension",
++     Outcome == "dx_dm5"  ~ "Dx of diabetes",
++     Outcome == "dx_hld5" ~ "Dx of hyperlipidemia"
++   ),
++   Model = 'Model 2') %>%
++   rename(`Adolescent MGE` = w1.GE_male_std, 
++          `Young adult MGE` = w4.GE_male_std,
++          `Change in MGE` = delta_w1_w4_GE) 
 
 > ################################################################################
-> # In each model add stars to estimates depending on significance  .... [TRUNCATED] 
+> # Model 3 ----------------------------------------------------------------------
+> ### (TX ~ MGE##DX + controls)  
+> ################################################################################
+> 
+> ame_by_dx_analysis <- function(frml, design, var, outcome, dx){
++   
++   frml1 <- as.formula(frml)
++   model <- svyglm(formula = frml1, design = design, 
++                   family = "quasibinomial")
++   
++   if (dx == 'dx_htn5'){
++     ame <-
++       summary(
++         margins(model, method = "dydx", design = design,
++                 variables = c(var), 
++                 at = list(dx_htn5 = c(1)))
++       )
++   }
++   
++   if (dx == 'dx_dm5'){
++     ame <-
++       summary(
++         margins(model, method = "dydx", design = design,
++                 variables = c(var), 
++                 at = list(dx_dm5 = c(1)))
++       )
++   }
++   
++   if (dx == 'dx_hld5'){
++     ame <-
++       summary(
++         mar .... [TRUNCATED] 
 
-> model.1$Estimate <- paste0(model.1$Estimate, model.1$stars)
+> # hypertension -----------------------------------------------------------------
+> 
+> htn.3a <- ame_by_dx_analysis(paste('w5_anti_htn ~ w1.GE_male_std*dx_htn5 +', controls),
++                               subset(ahdsgnbio, complete_case == 1),
++                              'w1.GE_male_std', 'w5_anti_htn', 'dx_htn5')
 
-> model.2 <- model.2 %>%
-+   mutate(
-+     stars = case_when(
-+       P_Value < 0.001 ~ "***",
-+       P_Value < 0.01 ~ "**",
-+       P_Value < 0.05 ~ .... [TRUNCATED] 
+> htn.3b <- ame_by_dx_analysis(paste('w5_anti_htn ~ w4.GE_male_std*dx_htn5 +', controls),
++                              subset(ahdsgnbio, complete_case == 1),
++                              'w4.GE_male_std', 'w5_anti_htn', 'dx_htn5')
 
-> model.2$Estimate <- paste0(model.2$Estimate, model.2$stars)
+> htn.3c <- ame_by_dx_analysis(paste('w5_anti_htn ~ delta_w1_w4_GE*dx_htn5 + w1.GE_male_std +', controls),
++                              subset(ahdsgnbio, complete_case == 1),
++                              'delta_w1_w4_GE', 'w5_anti_htn', 'dx_htn5')
 
-> model.3 <- model.3 %>%
-+   mutate(
-+     stars = case_when(
-+       P_Value < 0.001 ~ "***",
-+       P_Value < 0.01 ~ "**",
-+       P_Value < 0.05 ~ .... [TRUNCATED] 
+> htn.3 <- rbind(htn.3a, htn.3b, htn.3c)
 
-> model.3$Estimate <- paste0(model.3$Estimate, model.3$stars)
+> # diabetes ---------------------------------------------------------------------
+> 
+> dm.3a <- ame_by_dx_analysis(paste('w5_anti_dm_med_use ~ w1.GE_male_std*dx_dm5 +', controls),
++                             subset(ahdsgnbio, complete_case == 1),
++                             'w1.GE_male_std', 'w5_anti_dm_med_use', 'dx_dm5')
 
-> model.4 <- model.4 %>%
-+   mutate(
-+     stars = case_when(
-+       P_Value < 0.001 ~ "***",
-+       P_Value < 0.01 ~ "**",
-+       P_Value < 0.05 ~ .... [TRUNCATED] 
+> dm.3b <- ame_by_dx_analysis(paste('w5_anti_dm_med_use ~ w4.GE_male_std*dx_dm5 +', controls),
++                             subset(ahdsgnbio, complete_case == 1),
++                             'w4.GE_male_std', 'w5_anti_dm_med_use', 'dx_dm5')
 
-> model.4$Estimate <- paste0(model.4$Estimate, model.4$stars)
+> dm.3c <- ame_by_dx_analysis(paste('w5_anti_dm_med_use ~ delta_w1_w4_GE*dx_dm5 + w1.GE_male_std +', controls),
++                             subset(ahdsgnbio, complete_case == 1),
++                             'delta_w1_w4_GE', 'w5_anti_dm_med_use', 'dx_dm5')
+
+> dm.3 <- rbind(dm.3a, dm.3b, dm.3c)
+
+> # hyperlipidemia ---------------------------------------------------------------
+> 
+> hld.3a <- ame_by_dx_analysis(paste('w5_anti_hld_med_use ~ w1.GE_male_std*dx_hld5 +', controls),
++                              subset(ahdsgnbio, complete_case == 1),
++                              'w1.GE_male_std', 'w5_anti_hld_med_use', 'dx_hld5')
+
+> hld.3b <- ame_by_dx_analysis(paste('w5_anti_hld_med_use ~ w4.GE_male_std*dx_hld5 +', controls),
++                              subset(ahdsgnbio, complete_case == 1),
++                              'w4.GE_male_std', 'w5_anti_hld_med_use', 'dx_hld5')
+
+> hld.3c <- ame_by_dx_analysis(paste('w5_anti_hld_med_use ~ delta_w1_w4_GE*dx_hld5 + w1.GE_male_std +', controls),
++                              subset(ahdsgnbio, complete_case == 1),
++                              'delta_w1_w4_GE', 'w5_anti_hld_med_use', 'dx_hld5')
+
+> hld.3 <- rbind(hld.3a, hld.3b, hld.3c)
+
+> # combine ----------------------------------------------------------------------
+> model.3 <- rbind(htn.3, dm.3, hld.3) %>%
++   mutate(stars = case_when(
++     `AME P_value` < 0.01 ~ "***",
++     `AME P_value` < 0.05 ~ "**",
++     `AME P_value` < 0.1 ~ "*",
++     TRUE ~ ""),
++     values = paste(paste0(AME,stars), `AME 95% CI`, 'P Value =', `AME P_value`)) %>%
++   select(Outcome, Term, values) %>%
++   pivot_wider(names_from = Term, values_from = values) %>%
++   mutate(Outcome = case_when(
++     Outcome == "w5_anti_htn" ~ "Tx of hypertension",
++     Outcome == "w5_anti_dm_med_use"  ~ "Tx of diabetes",
++     Outcome == "w5_anti_hld_med_use" ~ "Tx of hyperlipidemia"
++   ),
++   Model = 'Model 3') %>%
++   rename(`Adolescent MGE` = w1.GE_male_std, 
++          `Young adult MGE` = w4.GE_male_std,
++          `Change in MGE` = delta_w1_w4_GE) 
 
 > ################################################################################
-> # Start the sink to capture output
-> options(width = 200)
+> # Model 4 ----------------------------------------------------------------------
+> ### (TX ~ MGE##DX + Bio-M + controls)  
+> ################################################################################
+> 
+> ahdsgnbp <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~weights.bio,
++   data=subset(final.df, in_sample.bio == 1 & is.na(psuscid) == F & is.na(region) == F & is.na(w5_bp) == F),
++   nest=TRUE)
 
-> sink("outputs/tables/Robustness Check.txt")
+> # hypertension -----------------------------------------------------------------
+> 
+> htn.4a <- ame_by_dx_analysis(paste('w5_anti_htn ~ w5_bp + w1.GE_male_std*dx_htn5 +', controls),
++                              subset(ahdsgnbp, complete_case == 1), 
++                              'w1.GE_male_std', 'w5_anti_htn', 'dx_htn5')
+
+> htn.4b <- ame_by_dx_analysis(paste('w5_anti_htn ~ w5_bp + w4.GE_male_std*dx_htn5 +', controls),
++                              subset(ahdsgnbp, complete_case == 1),
++                              'w4.GE_male_std', 'w5_anti_htn', 'dx_htn5')
+
+> htn.4c <- ame_by_dx_analysis(paste('w5_anti_htn ~ w5_bp + delta_w1_w4_GE*dx_htn5 + w1.GE_male_std +', controls),
++                              subset(ahdsgnbp, complete_case == 1),
++                              'delta_w1_w4_GE', 'w5_anti_htn', 'dx_htn5')
+
+> htn.4 <- rbind(htn.4a, htn.4b, htn.4c)
+
+> # diabetes ---------------------------------------------------------------------
+> 
+> ahdsgndm <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~weights.bio,
++   data=subset(final.df, in_sample.bio == 1 & is.na(psuscid) == F & is.na(region) == F & is.na(w5_a1c) == F),
++   nest=TRUE)
+
+> dm.4a <- ame_by_dx_analysis(paste('w5_anti_dm_med_use ~ w5_a1c + w1.GE_male_std*dx_dm5 +', controls),
++                             subset(ahdsgndm, complete_case == 1),
++                             'w1.GE_male_std', 'w5_anti_dm_med_use', 'dx_dm5')
+
+> dm.4b <- ame_by_dx_analysis(paste('w5_anti_dm_med_use ~ w5_a1c + w4.GE_male_std*dx_dm5 +', controls),
++                             subset(ahdsgndm, complete_case == 1),
++                             'w4.GE_male_std', 'w5_anti_dm_med_use', 'dx_dm5')
+
+> dm.4c <- ame_by_dx_analysis(paste('w5_anti_dm_med_use ~ w5_a1c + delta_w1_w4_GE*dx_dm5 + w1.GE_male_std +', controls),
++                             subset(ahdsgndm, complete_case == 1),
++                             'delta_w1_w4_GE', 'w5_anti_dm_med_use', 'dx_dm5')
+
+> dm.4 <- rbind(dm.4a, dm.4b, dm.4c)
+
+> # hyperlipidemia ---------------------------------------------------------------
+> 
+> ahdsgnhld <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~weights.bio,
++   data=subset(final.df, in_sample.bio == 1 & is.na(psuscid) == F & is.na(region) == F & is.na(w5_nhdl) == F),
++   nest=TRUE)
+
+> hld.4a <- ame_by_dx_analysis(paste('w5_anti_hld_med_use ~ w5_nhdl + w1.GE_male_std*dx_hld5 +', controls),
++                              subset(ahdsgnhld, complete_case == 1), 
++                              'w1.GE_male_std', 'w5_anti_hld_med_use', 'dx_hld5')
+
+> hld.4b <- ame_by_dx_analysis(paste('w5_anti_hld_med_use ~ w5_nhdl + w4.GE_male_std*dx_hld5 +', controls),
++                              subset(ahdsgnhld, complete_case == 1), 
++                              'w4.GE_male_std', 'w5_anti_hld_med_use', 'dx_hld5')
+
+> hld.4c <- ame_by_dx_analysis(paste('w5_anti_hld_med_use ~ w5_nhdl + delta_w1_w4_GE*dx_hld5 + w1.GE_male_std +', controls),
++                              subset(ahdsgnhld, complete_case == 1), 
++                              'delta_w1_w4_GE', 'w5_anti_hld_med_use', 'dx_hld5')
+
+> hld.4 <- rbind(hld.4a, hld.4b, hld.4c)
+
+> # combine ----------------------------------------------------------------------
+> 
+> model.4 <- rbind(htn.4, dm.4, hld.4) %>%
++   mutate(stars = case_when(
++     `AME P_value` < 0.01 ~ "***",
++     `AME P_value` < 0.05 ~ "**",
++     `AME P_value` < 0.1 ~ "*",
++     TRUE ~ ""),
++     values = paste(paste0(AME,stars), `AME 95% CI`, 'P Value =', `AME P_value`)) %>%
++   select(Outcome, Term, values) %>%
++   pivot_wider(names_from = Term, values_from = values) %>%
++   mutate(Outcome = case_when(
++     Outcome == "w5_anti_htn" ~ "Tx of hypertension",
++     Outcome == "w5_anti_dm_med_use"  ~ "Tx of diabetes",
++     Outcome == "w5_anti_hld_med_use" ~ "Tx of hyperlipidemia"
++   ),
++   Model = 'Model 4') %>%
++   rename(`Adolescent MGE` = w1.GE_male_std, 
++          `Young adult MGE` = w4.GE_male_std,
++          `Change in MGE` = delta_w1_w4_GE) 
+
+> ################################################################################
+> # Model 5 ----------------------------------------------------------------------
+> ### (Bio-M ~ MGE + controls)
+> ################################################################################
+> 
+> ahdsgn <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~w5biowgt,
++   data=subset(
++     final.df, in_sample.bio == 1 & is.na(psuscid) == F & is.na(region) == F
++   ),
++   nest=TRUE)
+
+> # hypertension -----------------------------------------------------------------
+> 
+> ahdsgnbp <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~weights.bio,
++   data=subset(final.df, in_sample.bio == 1 & is.na(psuscid) == F & is.na(region) == F & is.na(w5_anti_htn) == F),
++   nest=TRUE)
+
+> htn.5a <- ame_analysis(paste('w5_bp ~ w1.GE_male_std + w5_anti_htn +', controls),
++                        subset(ahdsgnbp, complete_case == 1),
++                        'w1.GE_male_std', 'w5_bp')
+
+> htn.5b <- ame_analysis(paste('w5_bp ~ w4.GE_male_std + w5_anti_htn +', controls),
++                        subset(ahdsgnbp, complete_case == 1),
++                        'w4.GE_male_std', 'w5_bp')
+
+> htn.5c <- ame_analysis(paste('w5_bp ~ delta_w1_w4_GE + w1.GE_male_std + w5_anti_htn +', controls),
++                        subset(ahdsgnbp, complete_case == 1),
++                        'delta_w1_w4_GE', 'w5_bp')
+
+> htn.5 <- rbind(htn.5a, htn.5b, htn.5c)
+
+> # diabetes ---------------------------------------------------------------------
+> 
+> ahdsgndm <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~weights.bio,
++   data=subset(final.df, in_sample.bio == 1 & is.na(psuscid) == F & is.na(region) == F & is.na(w5_anti_dm_med_use) == F),
++   nest=TRUE)
+
+> dm.5a <- ame_analysis(paste('w5_a1c ~ w1.GE_male_std + w5_anti_dm_med_use +', controls),
++                       subset(ahdsgndm, complete_case == 1),
++                       'w1.GE_male_std', 'w5_a1c')
+
+> dm.5b <- ame_analysis(paste('w5_a1c ~ w4.GE_male_std + w5_anti_dm_med_use +', controls),
++                       subset(ahdsgndm, complete_case == 1),
++                       'w4.GE_male_std', 'w5_a1c')
+
+> dm.5c <- ame_analysis(paste('w5_a1c ~ delta_w1_w4_GE + w1.GE_male_std + w5_anti_dm_med_use +', controls),
++                       subset(ahdsgndm, complete_case == 1),
++                       'delta_w1_w4_GE', 'w5_a1c')
+
+> dm.5 <- rbind(dm.5a, dm.5b, dm.5c)
+
+> # hyperlipidemia ---------------------------------------------------------------
+> 
+> ahdsgnhld <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~weights.bio,
++   data=subset(final.df, in_sample.bio == 1 & is.na(psuscid) == F & is.na(region) == F & is.na(w5_anti_hld_med_use) == F),
++   nest=TRUE)
+
+> hld.5a <- ame_analysis(paste('w5_nhdl ~ w1.GE_male_std + w5_anti_hld_med_use +', controls),
++                        subset(ahdsgnhld, complete_case == 1),
++                        'w1.GE_male_std', 'w5_nhdl')
+
+> hld.5b <- ame_analysis(paste('w5_nhdl ~ w4.GE_male_std + w5_anti_hld_med_use +', controls),
++                        subset(ahdsgnhld, complete_case == 1),
++                        'w4.GE_male_std', 'w5_nhdl')
+
+> hld.5c <- ame_analysis(paste('w5_nhdl ~ delta_w1_w4_GE + w1.GE_male_std + w5_anti_hld_med_use +', controls),
++                        subset(ahdsgnhld, complete_case == 1),
++                        'delta_w1_w4_GE', 'w5_nhdl')
+
+> hld.5 <- rbind(hld.5a, hld.5b, hld.5c)
+
+> # combine ----------------------------------------------------------------------
+> 
+> model.5 <- rbind(htn.5, dm.5, hld.5) %>%
++   mutate(stars = case_when(
++     `AME P_value` < 0.01 ~ "***",
++     `AME P_value` < 0.05 ~ "**",
++     `AME P_value` < 0.1 ~ "*",
++     TRUE ~ ""),
++     values = paste(paste0(AME,stars), `AME 95% CI`, 'P Value =', `AME P_value`)) %>%
++   select(Outcome, Term, values) %>%
++   pivot_wider(names_from = Term, values_from = values) %>%
++   mutate(Outcome = case_when(
++     Outcome == "w5_bp" ~ "Bio-M of hypertension",
++     Outcome == "w5_a1c"  ~ "Bio-M of diabetes",
++     Outcome == "w5_nhdl" ~ "Bio-M of hyperlipidemia"
++   ),
++   Model = 'Model 5') %>%
++   rename(`Adolescent MGE` = w1.GE_male_std, 
++          `Young adult MGE` = w4.GE_male_std,
++          `Change in MGE` = delta_w1_w4_GE) 
+
+> ################################################################################
+> # Create Table 2 --------------------------------------------------------------
+> ################################################################################
+> 
+> table2 <- rbind(model.1, model.2, model.3, model.4, model.5)
+
+> table2 <- table2 %>%
++ kable(caption = "Table 2. Coefficients (dy/dx) Estimating Associations 
++       between MGE and Adult Awareness, Treatment, 
++       and Biomeasure Evidence of Adult CVD Risks",
++       col.names = c("Outcome", 
++                     "Adolescent MGE", "Young Adult MGE",
++                     "Change in MGE", "Model")) %>%
++   kable_styling(font_size = 12, full_width = F) %>%
++   add_header_above(c(" " = 5)) 
+
+> save_kable(table2, file = "outputs/tables/Table 2.pdf")
+
+> ################################################################################
+> ################################################################################
+> ################################################################################
+> #-------------------------------------------------------------------------------
+> # Create eTable 2 --------------------------------------------------------------
+> # eTable 2. Item Missingness of Covariates
+> #-------------------------------------------------------------------------------
+> ################################################################################
+> 
+> vars.1 <- c('h1gh21', 'h1da5', 'h1fv5', 'h1gh28', 'h1pr4', 'h1da10', 'h1gh46', 
++           'h1ee4', 'h1ed7', 'h1fs2', 'h1gh39', 'h1da11', 'h1da1', 'h1pf15', 
++           'h1pr1', 'h1gh20', 'h1pf32', 'h1id5', 'h1da6', 'h1pf16', 'h1gh29', 
++           'h1pf10', 'h1ee2', 'h1fs4', 'h1gh42')
+
+> vars.4 <- c('h4to25', 'h4cj1', 'h4da16', 'h4pe5', 'h4pe9', 'h4pe2', 'h4da6', 
++           'h4da23', 'h4da8', 'h4pe4', 'h4re10', 'h4da17', 'h4mi1', 'h4da4', 
++           'h4mh23', 'h4pe6', 'h4mh7', 'h4pe10', 'h4pe35', 'h4da11', 'h4pe22',
++           'h4pe26')
+
+> covars <- c('race5', 'edu5', 'ins5', 'sespc_al', 'nhood1_d')
+
+> w1 <- final.df %>%
++   filter(in_sample0 == 1) %>%
++   summarise(
++     Total_N = n(),  
++     across(all_of(vars.1),
++            ~sum(is.na(.)) / Total_N * 100, 
++            .names = "perc_missing_{.col}"),  
++     Perc_Missing_Any = round(
++       sum(rowSums(is.na(select(., all_of(vars.1)))) > 0) / Total_N * 100, 2)
++     ) %>%
++   pivot_longer(cols = -Total_N, 
++                names_to = "Variable", 
++                values_to = "Percentage_Missing") %>%
++   filter(Variable == "Perc_Missing_Any") %>%
++   mutate(Variable = ifelse(Variable == "Perc_Missing_Any", 
++                            "Adolescent (Wave I) MGE", Variable))
+
+> w4 <- final.df %>%
++   filter(in_sample0 == 1) %>%
++   summarise(
++     Total_N = n(),  
++     across(all_of(vars.4),
++            ~sum(is.na(.)) / Total_N * 100, 
++            .names = "perc_missing_{.col}"),  
++     Perc_Missing_Any = round(
++       sum(rowSums(is.na(select(., all_of(vars.4)))) > 0) / Total_N * 100, 2)
++   ) %>%
++   pivot_longer(cols = -Total_N, 
++                names_to = "Variable", 
++                values_to = "Percentage_Missing") %>%
++   filter(Variable == "Perc_Missing_Any") %>%
++   mutate(Variable = ifelse(Variable == "Perc_Missing_Any", 
++                            "Young Adult (Wave IV) MGE", Variable))
+
+> cov <- final.df %>%
++   filter(in_sample0 == 1) %>%
++   summarise(
++     Total_N = n(),  
++     across(all_of(covars),
++            ~sum(is.na(.)) / Total_N * 100, 
++            .names = "perc_missing_{.col}"),  
++     Perc_Missing_Any = round(
++       sum(rowSums(is.na(select(., all_of(covars)))) > 0) / Total_N * 100, 2)
++   ) %>%
++   pivot_longer(cols = -Total_N, 
++                names_to = "Variable", 
++                values_to = "Percentage_Missing") %>%
++   filter(Variable != "Perc_Missing_Any") 
+
+> summary_table <- final.df %>%
++   filter(in_sample0 == 1) %>%
++   summarise(
++     Total_N = n(),  
++     across(all_of(c(covars, vars.1, vars.4)),
++            ~sum(is.na(.)) / Total_N * 100, 
++            .names = "perc_missing_{.col}"),  
++     Perc_Missing_Any = round(
++       sum(rowSums(is.na(select(., all_of(c(covars, vars.1, vars.4))))) > 0) / Total_N * 100, 2)
++   ) %>%
++   pivot_longer(cols = -Total_N, 
++                names_to = "Variable", 
++                values_to = "Percentage_Missing") %>%
++   filter(Variable == "Perc_Missing_Any") 
+
+> summary_table <- rbind(w1, w4, cov, summary_table)
+
+> summary_table$Percentage_Missing <- paste(
++   round(summary_table$Percentage_Missing, 2), '%'
++   )
+
+> summary_table %>%
++   kable(caption = "eTable 2. Item Missingness of Covariates",
++         col.names = c("Total N", 
++                       "Covariate", "% of Participants with Missing Data")) %>%
++   kable_styling(font_size = 12, full_width = F) %>%
++   save_kable(file = "outputs/tables/eTable 2 Item Missingness of Covariates.pdf")
+
+> ################################################################################
+> ################################################################################
+> ################################################################################
+> #-------------------------------------------------------------------------------
+> # Create eTable 3 --------------------------------------------------------------
+> # eTable 3. Sensitivity Analysis of Missing Data: Comparison of Participants 
+> # with and Without Complete Data, Add Health Waves I (1994-1995), 
+> # IV (2008-2009), and V (2016-2018)
+> #-------------------------------------------------------------------------------
+> ################################################################################
+> 
+> final.df$completion = ifelse(final.df$complete_case == 1, 
++                              'Complete Cases', 'Missing Cases')
+
+> final.df %>%
++   filter(in_sample == 1) %>%
++   tbl_summary(
++     by = completion, 
++     type = all_continuous() ~ "continuous2",
++     statistic = 
++       all_continuous() ~ c("{median} ({min}, {max})"),
++     missing = "no",
++     include = c('race5', 'sespc_al', 'nhood1_d', 
++                 'ins5', 'edu5', 'completion')) %>%
++   add_p(pvalue_fun = ~style_pvalue(.x, digits = 2),
++         test = list(all_continuous() ~ "t.test",
++                     all_categorical() ~ "chisq.test")) %>%
++   add_overall() %>%
++   modify_caption("**eTable 3. Sensitivity Analysis of Missing Data (unweighted)**") %>%
++   as_gt() %>%
++   gt::gtsave(filename = "outputs/tables/eTable 3 unweighted.png")
+
+> ahdsgn <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~gsw5,
++   data=subset(final.df,  in_sample.5 == 1 & is.na(psuscid) == F & is.na(region) == F),
++   nest=TRUE)
+
+> ahdsgn %>%
++   tbl_svysummary(
++     by = completion, 
++     type = all_continuous() ~ "continuous2",
++     statistic = 
++       all_continuous() ~ c("{median} ({min}, {max})"),
++     missing = "no",
++     include = c('race5', 'sespc_al', 'nhood1_d', 
++                 'ins5', 'edu5', 'completion')) %>%
++   add_p(pvalue_fun = ~style_pvalue(.x, digits = 2),
++         test = list(all_continuous() ~ "svy.wilcox.test",
++                     all_categorical() ~ "svy.chisq.test")) %>%
++   add_overall() %>%
++   modify_caption("**eTable 3. Sensitivity Analysis of Missing Data (weighted)**") %>%
++   as_gt() %>%
++   gt::gtsave(filename = "outputs/tables/eTable 3 weighted.png")
+
+> ################################################################################
+> 
 
 > ################################################################################
 > # AUTHOR:             Jacob Jameson
 > #
-> # DESCRIPTION:        T .... [TRUNCATED] 
+> # DESCRIPTION:        This script generates the figures for the paper.
+> #
+> # DEPENDENCIES:       The script requires the following dataset:
+> #                     -final.df, which is the final dataset constructed by 
+> #                      executing scr/prepare data/Construct Analytical dataset.R
+> ################################################################################
+> 
+> final.df$complete_case <- ifelse(
++   rowSums(
++     is.na(
++       final.df[, c('race5', 'sespc_al', 'nhood1_d', 'ins5', 'edu5')]
++     )
++   ) == 0, 1, 0)
 
-> subset_weights <- subset_df$weights
+> ahdsgnbio <- svydesign(
++   id=~psuscid,
++   strata=~region,
++   weights=~weights.bio,
++   data=subset(final.df, in_sample.bio == 1 & is.na(psuscid) == F & is.na(region) == F),
++   nest=TRUE)
 
-> formulas_htn <- c(
-+   'dx_htn5 ~ w1.GE_male_std + w5_bp + w1.GE_male_std*w5_bp + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'dx_htn5 ~ w4.GE_m .... [TRUNCATED] 
+> # hypertension -----------------------------------------------------------------
+> htn.2a <- svyglm(dx_htn5 ~ w1.GE_male_std*w5_bp + 
++                  race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
 
-> formulas_dm <- c(
-+   'dx_dm5 ~ w1.GE_male_std + w5_a1c + w1.GE_male_std*w5_a1c + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'dx_dm5 ~ w4.GE_ma .... [TRUNCATED] 
+> htn.2a <- ggpredict(htn.2a, terms = c('w1.GE_male_std [-2:2, by=0.5]', "w5_bp [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'w1.GE_male_std')
 
-> formulas_hld <- c(
-+   'dx_hld5 ~ w1.GE_male_std + w5_nhdl + w1.GE_male_std*w5_nhdl + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'dx_hld5 ~ w4. .... [TRUNCATED] 
+> htn.2b <- svyglm(dx_htn5 ~ w4.GE_male_std*w5_bp + 
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
 
-> plot_data_frames <- list() 
+> htn.2b <- ggpredict(htn.2b, terms = c('w4.GE_male_std [-2:2, by=0.5]', "w5_bp [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1)  %>%
++   mutate(model_type = 'w4.GE_male_std')
 
-> for (FORMULA in c(formulas_htn, formulas_dm, formulas_hld)) {
-+   model <- glm(FORMULA,
-+                data = subset_df, 
-+                weights .... [TRUNCATED] 
+> htn.2c <- svyglm(dx_htn5 ~ delta_w1_w4_GE*w5_bp + w1.GE_male_std +
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
 
-> # Combine all plot data frames into one
-> combined_plot_data <- do.call(rbind, plot_data_frames)
+> htn.2c <- ggpredict(htn.2c, terms = c('delta_w1_w4_GE [-2:2, by=0.5]', "w5_bp [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'delta_w1_w4_GE')
+
+> htn.2 <- rbind(htn.2a, htn.2b, htn.2c)
+
+> htn.2$model_outcome <- 'dx_htn5'
+
+> # diabetes ---------------------------------------------------------------------
+> 
+> dm.2a <- svyglm(dx_dm5 ~ w1.GE_male_std*w5_a1c + 
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
+
+> dm.2a <- ggpredict(dm.2a, terms = c('w1.GE_male_std [-2:2, by=0.5]', "w5_a1c [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'w1.GE_male_std')
+
+> dm.2b <- svyglm(dx_dm5 ~ w4.GE_male_std*w5_a1c + 
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
+
+> dm.2b <- ggpredict(dm.2b, terms = c('w4.GE_male_std [-2:2, by=0.5]', "w5_a1c [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1)  %>%
++   mutate(model_type = 'w4.GE_male_std')
+
+> dm.2c <- svyglm(dx_dm5 ~ delta_w1_w4_GE*w5_a1c + w1.GE_male_std +
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
+
+> dm.2c <- ggpredict(dm.2c, terms = c('delta_w1_w4_GE [-2:2, by=0.5]', "w5_a1c [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1)  %>%
++   mutate(model_type = 'delta_w1_w4_GE')
+
+> dm.2 <- rbind(dm.2a, dm.2b, dm.2c)
+
+> dm.2$model_outcome <- 'dx_dm5'
+
+> # hyperlipidemia --------------------------------------------------------------
+> 
+> hld.2a <- svyglm(dx_hld5 ~ w1.GE_male_std*w5_nhdl + 
++                   race5 + sespc_al + nhood1_d + ins5 + edu5,
++                 subset(ahdsgnbio, complete_case == 1),
++                 family = 'quasibinomial')
+
+> hld.2a <- ggpredict(hld.2a, terms = c('w1.GE_male_std [-2:2, by=0.5]', "w5_nhdl [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'w1.GE_male_std')
+
+> hld.2b <- svyglm(dx_hld5 ~ w4.GE_male_std*w5_nhdl + 
++                   race5 + sespc_al + nhood1_d + ins5 + edu5,
++                 subset(ahdsgnbio, complete_case == 1),
++                 family = 'quasibinomial')
+
+> hld.2b <- ggpredict(hld.2b, terms = c('w4.GE_male_std [-2:2, by=0.5]', "w5_nhdl [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'w4.GE_male_std')
+
+> hld.2c <- svyglm(dx_hld5 ~ delta_w1_w4_GE*w5_nhdl + w1.GE_male_std +
++                   race5 + sespc_al + nhood1_d + ins5 + edu5,
++                 subset(ahdsgnbio, complete_case == 1),
++                 family = 'quasibinomial')
+
+> hld.2c <- ggpredict(hld.2c, terms = c('delta_w1_w4_GE [-2:2, by=0.5]', "w5_nhdl [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'delta_w1_w4_GE')
+
+> hld.2 <- rbind(hld.2a, hld.2b, hld.2c)
+
+> hld.2$model_outcome <- 'dx_hld5'
+
+> # Combine all plot data frames into one ----------------------------------------
+> combined_plot_data <- rbind(htn.2, dm.2, hld.2)
 
 > # rename the model type if w1.GE_male_std then Adolescent MGE
 > combined_plot_data <- combined_plot_data %>%
 +   mutate(model_type = case_when(
-+    .... [TRUNCATED] 
++     model_type == 'w1.GE_male_std' ~ 'Adolescent MGE',
++     model_type == 'w4.GE_male_std' ~ 'Young Adult MGE',
++     model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult \nChange in MGE'
++   ),
++   model_outcome = case_when(
++     model_outcome == 'dx_htn5' ~ 'Hypertension Diagnosis',
++     model_outcome == 'dx_dm5' ~ 'Diabetes Diagnosis',
++     model_outcome == 'dx_hld5' ~ 'Hyperlipidemia Diagnosis'
++   ))
 
 > combined_plot_data$model_outcome <- factor(
-+   combined_plot_data$model_outcome, levels = c('Hypertension Awareness',
-+                             .... [TRUNCATED] 
++   combined_plot_data$model_outcome, levels = c('Hypertension Diagnosis',
++                                                'Diabetes Diagnosis', 
++                                                'Hyperlipidemia Diagnosis'))
 
 > combined_plot_data$model_type <- factor(
 +   combined_plot_data$model_type, 
-+   levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Youn .... [TRUNCATED] 
++   levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Young Adult \nChange in MGE'))
 
 > ggplot(combined_plot_data, aes(x=xvals)) +
-+   geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_type), alpha=0.5) +
-+   geom_line(aes(y=coef)) + 
- .... [TRUNCATED] 
++   geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_type), alpha=0.45) +
++   geom_line(aes(y=coef), size=1) + 
++   facet_grid(~model_type ~ model_outcome) +
++   geom_vline(xintercept =0, color='darkred', linetype = 'dotted') +
++   scale_fill_manual(values = c('Adolescent MGE' = '#DF8F44FF', 
++                                'Young Adult MGE' = '#00A1D5FF', 
++                                'Adolescent-to-Young Adult \nChange in MGE' = '#B24745FF')) +
++   scale_y_continuous(labels = scales::percent_format(accuracy = 1), breaks = c(0,0.25,0.5,0.75,1)) +
++   labs(fill = "MGE Measure",
++        y = "Predicted Probability\n", 
++        x='\nStandardized Male Gender Expressivity\n',
++        title = 'Associations of Male Gender Expressivity (MGE) with Predicted Probability of \nHypertension, Diabetes, or Hyperlipidemia Diagnoses Awareness in Men with \nBiomeasure Evidence of Disease\n',
++        caption = str_wrap('\n\nIncreased male gender exp .... [TRUNCATED] 
 
 > # save plot with white background
-> ggsave('outputs/figures/figure.1.png', width = 12, height = 11)
+> ggsave('outputs/figures/figure 1.png', width = 13.5, height = 11)
 
-> ################################################################################
+> # hypertension -----------------------------------------------------------------
+> htn.3a <- svyglm(w5_anti_htn ~ w1.GE_male_std*dx_htn5 + 
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
+
+> htn.3a <- ggpredict(htn.3a, terms = c('w1.GE_male_std [-2:2, by=0.5]', "dx_htn5 [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'w1.GE_male_std')
+
+> htn.3b <- svyglm(w5_anti_htn ~ w4.GE_male_std*dx_htn5 + 
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
+
+> htn.3b <- ggpredict(htn.3b, terms = c('w4.GE_male_std [-2:2, by=0.5]', "dx_htn5 [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1)  %>%
++   mutate(model_type = 'w4.GE_male_std')
+
+> htn.3c <- svyglm(w5_anti_htn ~ delta_w1_w4_GE*dx_htn5 + w1.GE_male_std +
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
+
+> htn.3c <- ggpredict(htn.3c, terms = c('delta_w1_w4_GE [-2:2, by=0.5]', "dx_htn5 [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'delta_w1_w4_GE')
+
+> htn.3 <- rbind(htn.3a, htn.3b, htn.3c)
+
+> htn.3$model_outcome <- 'w5_anti_htn'
+
+> # diabetes ---------------------------------------------------------------------
 > 
-> # Define the subset and weights
-> subset_df <- subset(final.df .... [TRUNCATED] 
+> dm.3a <- svyglm(w5_anti_dm_med_use ~ w1.GE_male_std*dx_dm5 + 
++                   race5 + sespc_al + nhood1_d + ins5 + edu5,
++                 subset(ahdsgnbio, complete_case == 1),
++                 family = 'quasibinomial')
 
-> subset_weights <- subset_df$weights
+> dm.3a <- ggpredict(dm.3a, terms = c('w1.GE_male_std [-2:2, by=0.5]', "dx_dm5 [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'w1.GE_male_std')
 
-> formulas_htn <- c(
-+   'w5_anti_htn ~ w1.GE_male_std + dx_htn5 + w1.GE_male_std*dx_htn5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'w5_anti_h .... [TRUNCATED] 
+> dm.3b <- svyglm(w5_anti_dm_med_use ~ w4.GE_male_std*dx_dm5 + 
++                   race5 + sespc_al + nhood1_d + ins5 + edu5,
++                 subset(ahdsgnbio, complete_case == 1),
++                 family = 'quasibinomial')
 
-> formulas_dm <- c(
-+   'w5_anti_dm_med_use ~ w1.GE_male_std + dx_dm5 + w1.GE_male_std*dx_dm5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'w5_an .... [TRUNCATED] 
+> dm.3b <- ggpredict(dm.3b, terms = c('w4.GE_male_std [-2:2, by=0.5]', "dx_dm5 [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1)  %>%
++   mutate(model_type = 'w4.GE_male_std')
 
-> formulas_hld <- c(
-+   'w5_anti_hld_med_use ~ w1.GE_male_std + dx_hld5 + w1.GE_male_std*dx_hld5 + race5 + sespc_al + nhood1_d + ins5 + edu5',
-+   'w .... [TRUNCATED] 
+> dm.3c <- svyglm(w5_anti_dm_med_use ~ delta_w1_w4_GE*dx_dm5 + w1.GE_male_std +
++                   race5 + sespc_al + nhood1_d + ins5 + edu5,
++                 subset(ahdsgnbio, complete_case == 1),
++                 family = 'quasibinomial')
 
-> plot_data_frames <- list() 
+> dm.3c <- ggpredict(dm.3c, terms = c('delta_w1_w4_GE [-2:2, by=0.5]', "dx_dm5 [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1)  %>%
++   mutate(model_type = 'delta_w1_w4_GE')
 
-> for (FORMULA in c(formulas_htn, formulas_dm, formulas_hld)) {
-+   model <- glm(FORMULA,
-+                data = subset_df, 
-+                weights .... [TRUNCATED] 
+> dm.3 <- rbind(dm.3a, dm.3b, dm.3c)
 
-> # Combine all plot data frames into one
-> combined_plot_data <- do.call(rbind, plot_data_frames)
+> dm.3$model_outcome <- 'w5_anti_dm_med_use'
+
+> # hyperlipidemia --------------------------------------------------------------
+> 
+> hld.3a <- svyglm(w5_anti_hld_med_use ~ w1.GE_male_std*dx_hld5 + 
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
+
+> hld.3a <- ggpredict(hld.3a, terms = c('w1.GE_male_std [-2:2, by=0.5]', "dx_hld5 [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'w1.GE_male_std')
+
+> hld.3b <- svyglm(w5_anti_hld_med_use ~ w4.GE_male_std*dx_hld5 + 
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
+
+> hld.3b <- ggpredict(hld.3b, terms = c('w4.GE_male_std [-2:2, by=0.5]', "dx_hld5 [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'w4.GE_male_std')
+
+> hld.3c <- svyglm(w5_anti_hld_med_use ~ delta_w1_w4_GE*dx_hld5 + w1.GE_male_std +
++                    race5 + sespc_al + nhood1_d + ins5 + edu5,
++                  subset(ahdsgnbio, complete_case == 1),
++                  family = 'quasibinomial')
+
+> hld.3c <- ggpredict(hld.3c, terms = c('delta_w1_w4_GE [-2:2, by=0.5]', "dx_hld5 [0,1]")) %>%
++   as.data.frame() %>%
++   select(xvals = x, coef = predicted, lower = conf.low, upper = conf.high, group) %>%
++   filter(group == 1) %>%
++   mutate(model_type = 'delta_w1_w4_GE')
+
+> hld.3 <- rbind(hld.3a, hld.3b, hld.3c)
+
+> hld.3$model_outcome <- 'w5_anti_hld_med_use'
+
+> # Combine all plot data frames into one ----------------------------------------
+> combined_plot_data <- rbind(htn.3, dm.3, hld.3)
 
 > # rename the model type if w1.GE_male_std then Adolescent MGE
 > combined_plot_data <- combined_plot_data %>%
 +   mutate(model_type = case_when(
-+    .... [TRUNCATED] 
++     model_type == 'w1.GE_male_std' ~ 'Adolescent MGE',
++     model_type == 'w4.GE_male_std' ~ 'Young Adult MGE',
++     model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult \nChange in MGE'
++   ),
++   model_outcome = case_when(
++     model_outcome == 'w5_anti_htn' ~ 'Hypertension Treatment',
++     model_outcome == 'w5_anti_dm_med_use' ~ 'Diabetes Treatment',
++     model_outcome == 'w5_anti_hld_med_use' ~ 'Hyperlipidemia Treatment'
++   ))
 
 > combined_plot_data$model_outcome <- factor(
-+   combined_plot_data$model_outcome, levels = c('Treatment of Hypertension',
-+                          .... [TRUNCATED] 
++   combined_plot_data$model_outcome, levels = c('Hypertension Treatment',
++                                                'Diabetes Treatment', 
++                                                'Hyperlipidemia Treatment'))
 
 > combined_plot_data$model_type <- factor(
 +   combined_plot_data$model_type, 
-+   levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Youn .... [TRUNCATED] 
++   levels = c('Adolescent MGE', 'Young Adult MGE', 
++              'Adolescent-to-Young Adult \nChange in MGE'))
 
 > ggplot(combined_plot_data, aes(x=xvals)) +
-+   geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_type), alpha=0.5) +
-+   geom_line(aes(y=coef)) + 
- .... [TRUNCATED] 
++   geom_ribbon(aes(ymin=lower,ymax=upper, fill= model_type), alpha=0.45) +
++   geom_line(aes(y=coef), size=1) + 
++   facet_grid(~model_type ~ model_outcome) +
++   geom_vline(xintercept =0, color='darkred', linetype = 'dotted') +
++   scale_fill_manual(values = c('Adolescent MGE' = '#DF8F44FF', 
++                                'Young Adult MGE' = '#00A1D5FF', 
++                                'Adolescent-to-Young Adult \nChange in MGE' = '#B24745FF')) +
++   scale_y_continuous(labels = scales::percent_format(accuracy = 1), breaks = c(0,0.25,0.5,0.75,1)) +
++   labs(fill = "MGE Measure",
++        y = "Predicted Probability\n", 
++        x='\nStandardized Male Gender Expressivity\n',
++        title = 'Associations of Male Gender Expressivity (MGE) with Predicted Probability of \nAdult Treatment of Hypertension, Diabetes, or Hyperlipidemia in Men who \nReport Having These Conditions. \n',
++        caption = str_wrap('\n\n\nIncreased male gender e .... [TRUNCATED] 
 
-> ggsave('outputs/figures/figure.2.png', width = 12, height = 11)
+> ggsave('outputs/figures/figure 2.png', width = 13.5, height = 11)
 
 All scripts have been executed successfully. 
     Outputs are available in the outputs directory.
-Log ended:  Sat Aug 17 13:12:12 2024 
+Log ended:  Wed Aug 28 16:55:14 2024 

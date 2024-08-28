@@ -8,11 +8,22 @@
 
 # Data paths ------------------------------------------------------------
 data_path <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Update 8.2021/Core Files - Wave V'
+data_path2 <- '~/Sue Goldie Dropbox/Jacob Jameson/Add Health/Data Upload 7.2021/Core Files - Wave V'
 survey_path <-  paste0(data_path, '/Wave V Mixed-Mode Survey Data')
 weights_path <-  paste0(data_path, '/Wave V Mixed-Mode Survey Weights')
 
 # Load the wave 5 data and wave 5 weights
 wave.5 <- read_xpt(paste0(survey_path, '/wave5.xpt'))
+wave.5 <- wave.5 %>%
+  filter(AID != '91884998') 
+
+survey_path <-  paste0(data_path2, '/Wave V Mixed-Mode Survey Data')
+wave.5b <- read_xpt(paste0(survey_path, '/wave5.xpt'))
+wave.5b <- wave.5b %>%
+  filter(AID == '91884998') 
+
+wave.5 <- rbind(wave.5, wave.5b)
+
 weights.5 <- read_xpt(paste0(weights_path, '/weights5.xpt'))
 
 # Merge wave 5 data with the weights

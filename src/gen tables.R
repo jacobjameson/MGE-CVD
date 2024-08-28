@@ -16,13 +16,13 @@
 #-------------------------------------------------------------------------------
 
 final.df$group <- ifelse(final.df$w4.GE_male_std >=0 & final.df$in_sample.5 == 1,
-                   'Below Average MGE in YA',
-                   'Above Average MGE in YA')
+                   'Above Average MGE in YA',
+                   'Below Average MGE in YA')
 
 vars <- c('race', 'edu5', 'ins5', 'sespc_al', 'nhood1_d', 
-          'dx_htn5', 'w5_bp', 'w5_anti_htn',
-          'dx_dm5', 'w5_a1c', 'w5_anti_dm_med_use',
-          'dx_hld5', 'w5_nhdl', 'w5_anti_hld_med_use')
+          'dx_htn5', 'w5_bp', 'w5_anti_htn', 'tx_dx_bp', 'dx_bio_bp',
+          'dx_dm5', 'w5_a1c', 'w5_anti_dm_med_use', 'tx_dx_dm', 'dx_bio_dm',
+          'dx_hld5', 'w5_nhdl', 'w5_anti_hld_med_use', 'tx_dx_hld', 'dx_bio_hld')
 
 final.df %>%
   filter(in_sample == 1) %>%
@@ -43,36 +43,6 @@ final.df %>%
   bold_labels() %>%
   as_gt() %>%
   gt::gtsave(filename = "outputs/tables/Table 1 unweighted.png")
-
-
-ahdsgn <- svydesign(
-  id=~psuscid,
-  strata=~region,
-  weights=~gsw5,
-  data=subset(final.df,  in_sample.5 == 1 & is.na(psuscid) == F & is.na(region) == F),
-  nest=TRUE)
-
-
-ahdsgn %>%
-  tbl_svysummary(
-    by = group, 
-    type = all_continuous() ~ "continuous2",
-    statistic = 
-      all_continuous() ~ c("{median} ({min}, {max})"),
-    missing = "always",
-    include = c(ins5, group)) %>%
-  # show percentage of missing data
-  add_n() %>%
-  add_p(pvalue_fun = ~style_pvalue(.x, digits = 2),
-        test = list(all_continuous() ~ "svy.wilcox.test",
-                    all_categorical() ~ "svy.chisq.test")) %>%
-  add_overall() %>%
-  modify_header(label ~ "**Variable**") %>%
-  modify_caption("**Table 1. Patient Characteristics (weighted)**") %>%
-  bold_labels() %>%
-  as_gt() %>%
-  gt::gtsave(filename = "outputs/tables/Table 1 weighted.png")
-
 
 
 ################################################################################
@@ -666,7 +636,7 @@ kable(caption = "Table 2. Coefficients (dy/dx) Estimating Associations
   kable_styling(font_size = 12, full_width = F) %>%
   add_header_above(c(" " = 5)) 
 
-save_kable(table2, file = "outputs/tables/Table 2 with Imputation All Missing.pdf")
+save_kable(table2, file = "outputs/tables/Table 2.pdf")
 
 
 ################################################################################
@@ -825,3 +795,4 @@ ahdsgn %>%
   gt::gtsave(filename = "outputs/tables/eTable 3 weighted.png")
 
 ################################################################################
+
