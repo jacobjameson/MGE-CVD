@@ -1,4 +1,4 @@
-# Male Gender Expressivity and Awareness and Treatment of Cardiovascular Disease Risks in Men
+# Title: Male Gender Expressivity and Diagnosis and Treatment of Cardiovascular Disease Risks in Men
 ## The Way to a Man’s Heart Disease
 
 Authors: Nathaniel J. Glasser, MD; Jacob C. Jameson, MS; Elbert S. Huang, MD; Ian M. Kronish, MD; Stacy Tessler Lindau, MD,; Monica Peek, MD; Elizabeth L. Tung, MD; Harold A. Pollack, PhD
@@ -7,11 +7,11 @@ Authors: Nathaniel J. Glasser, MD; Jacob C. Jameson, MS; Elbert S. Huang, MD; Ia
 
 ## Key Points
 
-Question:  What is the association of male gender expressivity (MGE) – a measure reflecting sociocultural pressures around masculinity – with awareness and treatment of modifiable cardiovascular disease risks?
+Question:  What is the association of male gender expressivity (MGE) – a measure reflecting sociocultural pressures to convey male gender identity – with diagnosis and treatment of modifiable cardiovascular disease risks?
 
-Findings: This cohort study involving 4,230 male participants found elevations in adolescent MGE were significantly associated with an 11% lower probability of adult hypertension treatment and a 15% lower probability of adult diabetes awareness. Elevations in young adult MGE were associated with lower probabilities of adult hypertension awareness, hypertension treatment, and diabetes treatment. 
+Findings: This cohort study involving 4,230 male participants found elevations in adolescent MGE were significantly associated with an 11% lower probability of adult hypertension treatment and a 15% lower probability of adult diabetes diagnoses. Elevations in young adult MGE were associated with lower probabilities of adult hypertension diagnoses, hypertension treatment, and diabetes treatment. 
  
-Meaning:  Sociocultural pressures to perform masculinity may lead to worse cardiovascular disease outcomes through associations with decreased awareness and treatment of modifiable risks.
+Meaning:  Sociocultural pressures to convey male gender may lead to worse cardiovascular disease outcomes through associations with decreased diagnosis and treatment of modifiable risks. 
 
 ## Project Reproducibility with `renv`
 
@@ -26,6 +26,6 @@ For issues related to project setup or execution, contact Jacob Jameson at jacob
 
 ## Key Figures
 
-![](https://github.com/jacobjameson/MGE-CVD/blob/master/outputs/figures/figure.1.png)
-![](https://github.com/jacobjameson/MGE-CVD/blob/master/outputs/figures/figure.2.png)
+![](https://github.com/jacobjameson/MGE-CVD/blob/outputs/figures/figure.1.png)
+![](https://github.com/jacobjameson/MGE-CVD/blob/outputs/figures/figure.2.png)
 
