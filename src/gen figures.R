@@ -218,7 +218,6 @@ ggplot(combined_plot_data, aes(x=xvals)) +
 # save plot with white background
 ggsave('outputs/figures/figure 1.png', width = 13.5, height = 11)
 ggsave('outputs/figures/figure 1.svg', width = 13.5, height = 11)
-ggsave('outputs/figures/figure 1.pdf', width = 13.5, height = 11)
 
 # hypertension -----------------------------------------------------------------
 htn.3a <- svyglm(w5_anti_htn ~ w1.GE_male_std*dx_htn5 + 

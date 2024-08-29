@@ -108,7 +108,7 @@ final.df$tx_dx_hld <- case_when(
 
 final.df$tx_dx_dm <- case_when(
   final.df$dx_dm5 == 1 & final.df$w5_anti_dm_med_use == 1 ~ 1,
-  final.df$dx_dm5 == 1 & final.df$w5_anti_dm_med_use == 1 ~ 0,
+  final.df$dx_dm5 == 1 & final.df$w5_anti_dm_med_use == 0 ~ 0,
   TRUE ~ NA
 )
 
