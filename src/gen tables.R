@@ -19,10 +19,17 @@ final.df$group <- ifelse(final.df$w4.GE_male_std >=0 & final.df$in_sample.5 == 1
                    'Above Average MGE in YA',
                    'Below Average MGE in YA')
 
-vars <- c('race', 'edu5', 'ins5', 'sespc_al', 'nhood1_d', 
+vars <- c('race5', 'edu5', 'ins5', 'sespc_al', 'nhood1_d', 
           'dx_htn5', 'w5_bp', 'w5_anti_htn', 'tx_dx_bp', 'dx_bio_bp',
           'dx_dm5', 'w5_a1c', 'w5_anti_dm_med_use', 'tx_dx_dm', 'dx_bio_dm',
           'dx_hld5', 'w5_nhdl', 'w5_anti_hld_med_use', 'tx_dx_hld', 'dx_bio_hld')
+
+fact <-c('dx_htn5', 'w5_bp', 'w5_anti_htn', 'tx_dx_bp', 'dx_bio_bp',
+         'dx_dm5', 'w5_a1c', 'w5_anti_dm_med_use', 'tx_dx_dm', 'dx_bio_dm',
+         'dx_hld5', 'w5_nhdl', 'w5_anti_hld_med_use', 'tx_dx_hld', 'dx_bio_hld')
+
+# factorize variables in vars
+final.df[, fact] <- lapply(final.df[, fact], factor)
 
 final.df %>%
   filter(in_sample == 1) %>%
@@ -55,7 +62,6 @@ final.df %>%
 # diabetes, and hyperlipidemia 
 ################################################################################
 #-------------------------------------------------------------------------------
-
 
 controls <- 'race5 + sespc_al + nhood1_d + ins5 + edu5'
 

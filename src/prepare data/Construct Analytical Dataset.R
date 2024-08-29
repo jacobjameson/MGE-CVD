@@ -94,22 +94,41 @@ final.df$cluster <- paste(final.df$region,final.df$psuscid)
 final.df$weights <- final.df$gsw5 / mean(final.df$gsw5, na.rm = T)
 final.df$weights.bio <- final.df$w5biowgt / mean(final.df$w5biowgt, na.rm = T)
 
-final.df$tx_dx_bp <- ifelse(
-  final.df$dx_htn5 == 1 & final.df$w5_anti_htn == 1, 1, 0)
+final.df$tx_dx_bp <- case_when(
+  final.df$dx_htn5 == 1 & final.df$w5_anti_htn == 1 ~ 1,
+  final.df$dx_htn5 == 1 & final.df$w5_anti_htn == 0 ~ 0,
+  TRUE ~ NA
+)
 
-final.df$tx_dx_hld <- ifelse(
-  final.df$dx_hld5 == 1 & final.df$w5_anti_hld_med_use == 1, 1, 0)
+final.df$tx_dx_hld <- case_when(
+  final.df$dx_hld5 == 1 & final.df$w5_anti_hld_med_use == 1 ~ 1,
+  final.df$dx_hld5 == 1 & final.df$w5_anti_hld_med_use == 0 ~ 0,
+  TRUE ~ NA
+)
 
-final.df$tx_dx_dm <- ifelse(
-  final.df$dx_dm5 == 1 & final.df$w5_anti_dm_med_use == 1, 1, 0)
+final.df$tx_dx_dm <- case_when(
+  final.df$dx_dm5 == 1 & final.df$w5_anti_dm_med_use == 1 ~ 1,
+  final.df$dx_dm5 == 1 & final.df$w5_anti_dm_med_use == 1 ~ 0,
+  TRUE ~ NA
+)
 
-final.df$dx_bio_bp <- ifelse(
-  final.df$dx_htn5 == 1 & final.df$w5_bp == 1, 1, 0)
+final.df$dx_bio_bp <- case_when(
+  final.df$dx_htn5 == 1 & final.df$w5_bp == 1 ~ 1,
+  final.df$dx_htn5 == 0 & final.df$w5_bp == 1 ~ 0,
+  TRUE ~ NA
+)
+  
+final.df$dx_bio_hld <- case_when(
+  final.df$dx_hld5 == 1 & final.df$w5_nhdl == 1 ~ 1,
+  final.df$dx_hld5 == 0 & final.df$w5_nhdl == 1 ~ 0,
+  TRUE ~ NA
+)
 
-final.df$dx_bio_hld <- ifelse(
-  final.df$dx_hld5 == 1 & final.df$w5_nhdl == 1, 1, 0)
+final.df$dx_bio_dm <- case_when(
+  final.df$dx_dm5 == 1 & final.df$w5_a1c == 1 ~ 1,
+  final.df$dx_dm5 == 0 & final.df$w5_a1c == 1 ~ 0,
+  TRUE ~ NA
+)
 
-final.df$dx_bio_dm <- ifelse(
-  final.df$dx_dm5 == 1 & final.df$w5_a1c == 1, 1, 0)
 
 ################################################################################

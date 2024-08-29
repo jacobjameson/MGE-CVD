@@ -147,7 +147,7 @@ combined_plot_data <- combined_plot_data %>%
   mutate(model_type = case_when(
     model_type == 'w1.GE_male_std' ~ 'Adolescent MGE',
     model_type == 'w4.GE_male_std' ~ 'Young Adult MGE',
-    model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult \nChange in MGE'
+    model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult Change in MGE'
   ),
   model_outcome = case_when(
     model_outcome == 'dx_htn5' ~ 'Hypertension Diagnosis',
@@ -162,7 +162,7 @@ combined_plot_data$model_outcome <- factor(
 
 combined_plot_data$model_type <- factor(
   combined_plot_data$model_type, 
-  levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Young Adult \nChange in MGE'))
+  levels = c('Adolescent MGE', 'Young Adult MGE', 'Adolescent-to-Young Adult Change in MGE'))
 
 
 
@@ -173,28 +173,27 @@ ggplot(combined_plot_data, aes(x=xvals)) +
   geom_vline(xintercept =0, color='darkred', linetype = 'dotted') +
   scale_fill_manual(values = c('Adolescent MGE' = '#DF8F44FF', 
                                'Young Adult MGE' = '#00A1D5FF', 
-                               'Adolescent-to-Young Adult \nChange in MGE' = '#B24745FF')) +
+                               'Adolescent-to-Young Adult Change in MGE' = '#B24745FF')) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), breaks = c(0,0.25,0.5,0.75,1)) +
-  labs(fill = "MGE Measure",
+  labs(fill = "",
        y = "Predicted Probability\n", 
        x='\nStandardized Male Gender Expressivity\n',
-       title = 'Associations of Male Gender Expressivity (MGE) with Predicted Probability of \nHypertension, Diabetes, or Hyperlipidemia Diagnoses Awareness in Men with \nBiomeasure Evidence of Disease\n',
-       caption = str_wrap('\n\nIncreased male gender expressivity in adolescence 
-                          is significantly associated with decreased adult awareness 
-                          of diabetes among men with elevated hemoglobin a1c levels > 6.5%. 
-                          Increased male gender expression in young adulthood is significantly
-                          associated with decreased adult awareness of hypertension among 
-                          men with elevated blood pressure readings (> 130 mm Hg systolic 
-                          and/or > 80 mm Hg diastolic)', 125)) +
-  theme_calc(base_family = "Times New Roman") +
-  theme(plot.title = element_text(face = "bold",
-                                  size = rel(1.2)),
+       title = 'Figure 1: Associations of Male Gender Expressivity (MGE) with \nAdult Diagnosis of Hypertension, Diabetes, and Hyperlipidemia\n',
+       caption = str_wrap('\n\nCaption: Higher male gender expressivity (MGE) in adolescence 
+                          was significantly associated with a lower predicted probability of adult  
+                          diabetes diagnosis among men with elevated hemoglobin a1c levels ≥ 6.5%. 
+                          Higher MGE in young adulthood was significantly
+                          associated with a lower predicted probability of adult hypertension diagnosis among 
+                          men with elevated blood pressure (≥ 130 mm Hg systolic 
+                          and/or ≥ 80 mm Hg diastolic).', 125)) +
+  theme_calc(base_family = "Arial") +
+  theme(plot.title = element_text(size = rel(1.2)),
         text = element_text(size = 20),
         strip.text.y = element_blank(),
         panel.background = element_rect(fill = 'white'),
         plot.background = element_rect(fill = 'white'),
         panel.border = element_rect(colour = NA),
-        axis.title = element_text(face = "bold",size = rel(1)),
+        axis.title = element_text(size = rel(1)),
         axis.title.y = element_text(angle=90,vjust =2),
         axis.title.x = element_text(vjust = -0.2),
         axis.text = element_text(), 
@@ -218,7 +217,8 @@ ggplot(combined_plot_data, aes(x=xvals)) +
 
 # save plot with white background
 ggsave('outputs/figures/figure 1.png', width = 13.5, height = 11)
-
+ggsave('outputs/figures/figure 1.svg', width = 13.5, height = 11)
+ggsave('outputs/figures/figure 1.pdf', width = 13.5, height = 11)
 
 # hypertension -----------------------------------------------------------------
 htn.3a <- svyglm(w5_anti_htn ~ w1.GE_male_std*dx_htn5 + 
@@ -344,7 +344,7 @@ combined_plot_data <- combined_plot_data %>%
   mutate(model_type = case_when(
     model_type == 'w1.GE_male_std' ~ 'Adolescent MGE',
     model_type == 'w4.GE_male_std' ~ 'Young Adult MGE',
-    model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult \nChange in MGE'
+    model_type == 'delta_w1_w4_GE' ~ 'Adolescent-to-Young Adult Change in MGE'
   ),
   model_outcome = case_when(
     model_outcome == 'w5_anti_htn' ~ 'Hypertension Treatment',
@@ -360,7 +360,7 @@ combined_plot_data$model_outcome <- factor(
 combined_plot_data$model_type <- factor(
   combined_plot_data$model_type, 
   levels = c('Adolescent MGE', 'Young Adult MGE', 
-             'Adolescent-to-Young Adult \nChange in MGE'))
+             'Adolescent-to-Young Adult Change in MGE'))
 
 
 
@@ -372,29 +372,28 @@ ggplot(combined_plot_data, aes(x=xvals)) +
   geom_vline(xintercept =0, color='darkred', linetype = 'dotted') +
   scale_fill_manual(values = c('Adolescent MGE' = '#DF8F44FF', 
                                'Young Adult MGE' = '#00A1D5FF', 
-                               'Adolescent-to-Young Adult \nChange in MGE' = '#B24745FF')) +
+                               'Adolescent-to-Young Adult Change in MGE' = '#B24745FF')) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), breaks = c(0,0.25,0.5,0.75,1)) +
-  labs(fill = "MGE Measure",
+  labs(fill = "",
        y = "Predicted Probability\n", 
        x='\nStandardized Male Gender Expressivity\n',
-       title = 'Associations of Male Gender Expressivity (MGE) with Predicted Probability of \nAdult Treatment of Hypertension, Diabetes, or Hyperlipidemia in Men who \nReport Having These Conditions. \n',
-       caption = str_wrap('\n\n\nIncreased male gender expressivity in adolescence 
-                          is significantly associated with decreased adult 
-                          treatment of hypertension among men who report 
-                          awareness of hypertension diagnoses. Increased 
-                          male gender expression in young adulthood is 
-                          significantly associated with decreased adult 
+       title = 'Figure 2: Associations of Male Gender Expressivity (MGE) with \nAdult Treatment of Hypertension, Diabetes, and Hyperlipidemia\n',
+       caption = str_wrap('\n\n\n Caption: Higher male gender expressivity (MGE) in adolescence 
+                          was significantly associated with a lower predicted probability of adult 
+                          treatment of hypertension among men who reported 
+                          hypertension diagnoses. Higher 
+                          MGE in young adulthood was 
+                          significantly associated with a lower predicted probability of adult 
                           treatment of hypertension and diabetes among men 
-                          who report awareness of hypertension and diabetes respectively)', 125)) +
-  theme_calc(base_family = "Times New Roman") +
-  theme(plot.title = element_text(face = "bold",
-                                  size = rel(1.2)),
+                          who reported diagnoses of hypertension and diabetes respectively.', 125)) +
+  theme_calc(base_family = "Arial") +
+  theme(plot.title = element_text(size = rel(1.2)),
         text = element_text(size = 20),
         strip.text.y = element_blank(),
         panel.background = element_rect(fill = 'white'),
         plot.background = element_rect(fill = 'white'),
         panel.border = element_rect(colour = NA),
-        axis.title = element_text(face = "bold",size = rel(1)),
+        axis.title = element_text(size = rel(1)),
         axis.title.y = element_text(angle=90,vjust =2),
         axis.title.x = element_text(vjust = -0.2),
         axis.text = element_text(), 
@@ -419,4 +418,5 @@ ggplot(combined_plot_data, aes(x=xvals)) +
 
 
 ggsave('outputs/figures/figure 2.png', width = 13.5, height = 11)
+ggsave('outputs/figures/figure 2.svg', width = 13.5, height = 11)
 
