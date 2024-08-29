@@ -26,6 +26,6 @@ For issues related to project setup or execution, contact Jacob Jameson at jacob
 
 ## Key Figures
 
-![](https://github.com/jacobjameson/MGE-CVD/blob/outputs/figures/figure.1.png)
-![](https://github.com/jacobjameson/MGE-CVD/blob/outputs/figures/figure.2.png)
+![](https://github.com/jacobjameson/MGE-CVD/blob/master/outputs/figures/figure%201.png)
+![](https://github.com/jacobjameson/MGE-CVD/blob/master/outputs/figures/figure%202.png)
 
